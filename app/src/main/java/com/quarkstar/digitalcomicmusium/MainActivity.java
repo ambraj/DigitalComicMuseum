@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,7 +18,7 @@ import java.net.URLConnection;
 public class MainActivity extends AppCompatActivity {
 
     ImageView mImageView;
-    String murl;
+    String html;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,43 +77,99 @@ public class MainActivity extends AppCompatActivity {
             // onPostExecute displays the results of the AsyncTask.
             @Override
             protected void onPostExecute(String result) {
-                int index = result.indexOf("img src='cache");
-                int lindex = result.indexOf("' width", index);
 
-                result = result.substring(index + 9, lindex);
-
-                murl = "http://digitalcomicmuseum.com/preview/" + result;
+                html = result;
 
                 new Thread(new Runnable() {
+
+                    private String getMediaStorageDir() {
+                        // To be safe, you should check that the SDCard is mounted
+                        // using Environment.getExternalStorageState() before doing this.
+                        File mediaStorageDir = new File(Environment.getExternalStorageDirectory()
+//                            + "/Android/data/"
+//                            + getApplicationContext().getPackageName()
+//                            + "/Files");
+                              + "/Download");
+
+                        // This location works best if you want the created images to be shared
+                        // between applications and persist after your app has been uninstalled.
+
+                        // Create the storage directory if it does not exist
+                        if (! mediaStorageDir.exists()){
+                            if (! mediaStorageDir.mkdirs()){
+                                return null;
+                            }
+                        }
+                        return mediaStorageDir.getPath();
+                    }
+
+                    /** Create a File for saving an image or video */
+                    private  File getOutputMediaFile() {
+                        // Create a media file name
+                        File mediaFile;
+                        //String mImageName="MI_"+ timeStamp +".jpg";
+                        String mImageName="MI_"+ "1" +".jpg";
+                        mediaFile = new File(getMediaStorageDir() + File.separator + mImageName);
+                        return mediaFile;
+                    }
+
+                    private void storeImage(Bitmap image) {
+                        File pictureFile = getOutputMediaFile();
+                        if (pictureFile == null) {
+//                            Log.d(TAG,
+  //                              "Error creating media file, check storage permissions: ");// e.getMessage());
+                            return;
+                        }
+                        try {
+                            FileOutputStream fos = new FileOutputStream(pictureFile);
+                            image.compress(Bitmap.CompressFormat.PNG, 50, fos);
+                            fos.close();
+                        } catch (FileNotFoundException e) {
+    //                        Log.d(TAG, "File not found: " + e.getMessage());
+                        } catch (IOException e) {
+      //                      Log.d(TAG, "Error accessing file: " + e.getMessage());
+                        }
+                    }
+
+                    private Bitmap loadImageFromStorage(String path)
+                    {
+                        Bitmap b;
+                        try {
+                            File f = new File(path, "MI_1.jpg");
+                            b = BitmapFactory.decodeStream(new FileInputStream(f));
+
+                            return b;
+                        }
+                        catch (FileNotFoundException e)
+                        {
+                            e.printStackTrace();
+                        }
+
+                        return null;
+                    }
 
                     private Bitmap loadImageFromNetwork(String str){
                         try {
                             Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL(str).getContent());
 
-                            File mediaFile;
-                            String mImageName="1" + ".jpg";
-                            mediaFile = new File(getFilesDir() + File.separator + mImageName);
+                            storeImage(bitmap);
 
-                            FileOutputStream fos = new FileOutputStream(mediaFile);
-                            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
-                            fos.close();
-
-                            String[] st = fileList();
-
-                            //FileInputStream fis = new FileInputStream(getFilesDir() + fileList()[0]);
-                            Bitmap btmp = BitmapFactory.decodeFile(getFilesDir() + File.separator + fileList()[0]);
-
-                            //Log.e("FILE:", st[0]);
-
-                            return btmp;
+                            return loadImageFromStorage(getMediaStorageDir());
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
                         return null;
                     }
 
+                    private String getImageUrl(String html) {
+                        int index = html.indexOf("img src='cache");
+                        int lindex = html.indexOf("' width", index);
+
+                        return "http://digitalcomicmuseum.com/preview/" + html.substring(index + 9, lindex);
+                    }
+
                     public void run() {
-                        final Bitmap b = loadImageFromNetwork(murl);
+                        final Bitmap b = loadImageFromNetwork(getImageUrl(html));
 
                         runOnUiThread(new Runnable() {
                                           @Override
