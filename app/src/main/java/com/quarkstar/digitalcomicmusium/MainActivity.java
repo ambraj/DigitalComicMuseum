@@ -1,5 +1,6 @@
 package com.quarkstar.digitalcomicmusium;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -104,38 +105,31 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     /** Create a File for saving an image or video */
-                    private  File getOutputMediaFile() {
+                    private  String getOutputMediaFile() {
                         // Create a media file name
-                        File mediaFile;
                         //String mImageName="MI_"+ timeStamp +".jpg";
                         String mImageName="MI_"+ "1" +".jpg";
-                        mediaFile = new File(getMediaStorageDir() + File.separator + mImageName);
-                        return mediaFile;
+                        return mImageName;
                     }
 
                     private void storeImage(Bitmap image) {
-                        File pictureFile = getOutputMediaFile();
-                        if (pictureFile == null) {
-//                            Log.d(TAG,
-  //                              "Error creating media file, check storage permissions: ");// e.getMessage());
-                            return;
-                        }
+                        FileOutputStream outputStream;
+
                         try {
-                            FileOutputStream fos = new FileOutputStream(pictureFile);
-                            image.compress(Bitmap.CompressFormat.PNG, 50, fos);
-                            fos.close();
-                        } catch (FileNotFoundException e) {
-    //                        Log.d(TAG, "File not found: " + e.getMessage());
-                        } catch (IOException e) {
-      //                      Log.d(TAG, "Error accessing file: " + e.getMessage());
+                            outputStream = openFileOutput(getOutputMediaFile(), Context.MODE_PRIVATE);
+                            image.compress(Bitmap.CompressFormat.PNG, 50, outputStream);
+                            outputStream.close();
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
                     }
 
-                    private Bitmap loadImageFromStorage(String path)
+                    private Bitmap loadImageFromStorage()
                     {
                         Bitmap b;
                         try {
-                            File f = new File(path, "MI_1.jpg");
+                            File f = new File(getApplicationContext().getFilesDir(), getOutputMediaFile());
+
                             b = BitmapFactory.decodeStream(new FileInputStream(f));
 
                             return b;
@@ -154,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
 
                             storeImage(bitmap);
 
-                            return loadImageFromStorage(getMediaStorageDir());
+                            return loadImageFromStorage();
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
