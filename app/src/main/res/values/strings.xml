@@ -3,4 +3,15 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+
+    <string name="comic_1">Adventures_into_the_Unknown_001</string>
+    <string name="comic_2">Big_Shot_Comics_005</string>
+    <string name="comic_3">Space_Detective_001</string>
+    <string name="comic_4">Wings_013</string>
+
+    <string name="url_comic">c</string>
+    <string name="url_thumb">t</string>
+
+    <string name="base_url">https://dl.dropboxusercontent.com/u/21785336</string>
+
 </resources>

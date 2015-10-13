@@ -14,7 +14,6 @@ import android.widget.ImageView;
 
 import java.io.*;
 import java.net.URL;
-import java.net.URLConnection;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -37,44 +36,13 @@ public class MainActivity extends AppCompatActivity {
 
         mImageView = (ImageView)findViewById(R.id.imageView);
 
-        // Uses AsyncTask to create a task away from the main UI thread. This task takes a
-        // URL string and uses it to create an HttpUrlConnection. Once the connection
-        // has been established, the AsyncTask downloads the contents of the webpage as
-        // an InputStream. Finally, the InputStream is converted into a string, which is
-        // displayed in the UI by the AsyncTask's onPostExecute method.
-        class DownloadWebpageTask extends AsyncTask<String, Void, String> {
+        class DownloadImage extends AsyncTask<String, Void, String> {
 
-            // Given a URL, establishes an HttpUrlConnection and retrieves
-            // the web page content as a InputStream, which it returns as
-            // a string.
-            private String downloadUrl(String myurl) throws IOException {
-                // Build and set timeout values for the request.
-                URLConnection connection = (new URL(myurl)).openConnection();
-                connection.setConnectTimeout(5000);
-                connection.setReadTimeout(5000);
-                connection.connect();
-
-                // Read and store the result line by line then return the entire string.
-                InputStream in = connection.getInputStream();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-                StringBuilder html = new StringBuilder();
-                for (String line; (line = reader.readLine()) != null; ) {
-                    html.append(line);
-                }
-                in.close();
-
-                return html.toString();
-            }
             @Override
-            protected String doInBackground(String... urls) {
-
-                // params comes from the execute() call: params[0] is the url.
-                try {
-                    return downloadUrl(urls[0]);
-                } catch (IOException e) {
-                    return "Unable to retrieve web page. URL may be invalid.";
-                }
+            protected String doInBackground(String... params) {
+                return null;
             }
+
             // onPostExecute displays the results of the AsyncTask.
             @Override
             protected void onPostExecute(String result) {
@@ -104,66 +72,65 @@ public class MainActivity extends AppCompatActivity {
                         return mediaStorageDir.getPath();
                     }
 
-                    /** Create a File for saving an image or video */
-                    private  String getOutputMediaFile() {
-                        // Create a media file name
-                        //String mImageName="MI_"+ timeStamp +".jpg";
-                        String mImageName="MI_"+ "1" +".jpg";
-                        return mImageName;
-                    }
-
-                    private void storeImage(Bitmap image) {
+                    private void storeImage(Bitmap image, String image_name) {
                         FileOutputStream outputStream;
 
                         try {
-                            outputStream = openFileOutput(getOutputMediaFile(), Context.MODE_PRIVATE);
-                            image.compress(Bitmap.CompressFormat.PNG, 50, outputStream);
+                            outputStream = openFileOutput(image_name, Context.MODE_PRIVATE);
+                            image.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
                             outputStream.close();
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }
 
-                    private Bitmap loadImageFromStorage()
+                    private Bitmap loadImageFromStorage(String image_name)
                     {
-                        Bitmap b;
                         try {
-                            File f = new File(getApplicationContext().getFilesDir(), getOutputMediaFile());
-
-                            b = BitmapFactory.decodeStream(new FileInputStream(f));
-
-                            return b;
+                            File f = new File(getApplicationContext().getFilesDir(), image_name);
+                            return BitmapFactory.decodeStream(new FileInputStream(f));
                         }
                         catch (FileNotFoundException e)
                         {
                             e.printStackTrace();
                         }
-
                         return null;
                     }
 
-                    private Bitmap loadImageFromNetwork(String str){
+                    private Bitmap loadImageFromNetwork(String url, String image_name){
                         try {
-                            Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL(str).getContent());
-
-                            storeImage(bitmap);
-
-                            return loadImageFromStorage();
+                            Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL(url).getContent());
+                            storeImage(bitmap, image_name);
+                            return bitmap;
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
                         return null;
                     }
 
-                    private String getImageUrl(String html) {
-                        int index = html.indexOf("img src='cache");
-                        int lindex = html.indexOf("' width", index);
+                    private String getImageUrl(String comic_name, String comic_link, String file_name) {
+                        return getResources().getString(R.string.base_url) + "/" + comic_name + "/" + comic_link + "/" + file_name;
+                    }
 
-                        return "http://digitalcomicmuseum.com/preview/" + html.substring(index + 9, lindex);
+                    private String getImageNameLocal(String comic_name, String comic_link, String file_name) {
+                        return comic_name + "_" + comic_link + "_" + file_name;
+                    }
+
+                    private Bitmap loadImage() {
+                        String comic_name = getResources().getString(R.string.comic_1);
+                        String comic_link = getResources().getString(R.string.url_comic);
+                        String file_name  = "001.jpg";
+                        Bitmap bitmap = loadImageFromStorage(getImageNameLocal(comic_name, comic_link, file_name));
+                        if (bitmap == null)
+                        {
+                            bitmap = loadImageFromNetwork(getImageUrl(comic_name, comic_link, file_name), getImageNameLocal(comic_name, comic_link, file_name));
+                        }
+
+                        return bitmap;
                     }
 
                     public void run() {
-                        final Bitmap b = loadImageFromNetwork(getImageUrl(html));
+                        final Bitmap b = loadImage();
 
                         runOnUiThread(new Runnable() {
                                           @Override
@@ -177,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        new DownloadWebpageTask().execute("http://digitalcomicmuseum.com/preview/index.php?did=20137");
+        new DownloadImage().execute();
     }
 
     @Override
