@@ -4,6 +4,8 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
 
+    <string name="comic_name">Comic Name</string>
+
     <string name="comic_1">Adventures_into_the_Unknown_001</string>
     <string name="comic_2">Big_Shot_Comics_005</string>
     <string name="comic_3">Space_Detective_001</string>

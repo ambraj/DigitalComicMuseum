@@ -1,130 +1,42 @@
 package com.quarkstar.digitalcomicmusium;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
+import android.graphics.Rect;
 import android.os.Bundle;
-import android.support.v4.view.MotionEventCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
+import com.quarkstar.digitalcomicmusium.adapter.AllGamesAdapter;
+import com.quarkstar.digitalcomicmusium.adapter.ComicData;
 
-import java.io.*;
-import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     ImageView mImageView;
-    String DEBUG_TAG = "My app";
-
-    int current_page_number = 1;
+    private RecyclerView mRecyclerView;
+    private AllGamesAdapter mAdapter;
+    private List<ComicData> comicList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        int mUIFlag = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                | View.SYSTEM_UI_FLAG_LOW_PROFILE
-                | View.SYSTEM_UI_FLAG_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+        mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        int spacingInPixels = getResources().getDimensionPixelSize(R.dimen.spacing_card);
+        mRecyclerView.addItemDecoration(new SpacesItemDecoration(spacingInPixels));
+        mRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+        mRecyclerView.setHasFixedSize(true);
 
-        getWindow().getDecorView().setSystemUiVisibility(mUIFlag);
+        setUpGameList();
 
-        mImageView = (ImageView)findViewById(R.id.imageView);
-
-        new DownloadImage().execute();
-    }
-
-    class DownloadImage extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected String doInBackground(String... params) {
-            return null;
-        }
-
-        // onPostExecute displays the results of the AsyncTask.
-        @Override
-        protected void onPostExecute(String result) {
-
-            new Thread(new Runnable() {
-
-                private void storeImage(Bitmap image, String image_name) {
-                    FileOutputStream outputStream;
-
-                    try {
-                        outputStream = openFileOutput(image_name, Context.MODE_PRIVATE);
-                        image.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
-                        outputStream.close();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                private Bitmap loadImageFromStorage(String image_name)
-                {
-                    try {
-                        File f = new File(getApplicationContext().getFilesDir(), image_name);
-                        return BitmapFactory.decodeStream(new FileInputStream(f));
-                    }
-                    catch (FileNotFoundException e)
-                    {
-                        e.printStackTrace();
-                    }
-                    return null;
-                }
-
-                private Bitmap loadImageFromNetwork(String url, String image_name){
-                    try {
-                        Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL(url).getContent());
-                        storeImage(bitmap, image_name);
-                        return bitmap;
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    return null;
-                }
-
-                private String getImageUrl(String comic_name, String comic_link, String file_name) {
-                    return getResources().getString(R.string.base_url) + "/" + comic_name + "/" + comic_link + "/" + file_name;
-                }
-
-                private String getImageNameLocal(String comic_name, String comic_link, String file_name) {
-                    return comic_name + "_" + comic_link + "_" + file_name;
-                }
-
-                private Bitmap loadImage() {
-                    String comic_name = getResources().getString(R.string.comic_1);
-                    String comic_link = getResources().getString(R.string.url_comic);
-                    String file_name  = String.format("%03d", current_page_number) + ".jpg";
-                    Bitmap bitmap = loadImageFromStorage(getImageNameLocal(comic_name, comic_link, file_name));
-                    if (bitmap == null)
-                    {
-                        bitmap = loadImageFromNetwork(getImageUrl(comic_name, comic_link, file_name), getImageNameLocal(comic_name, comic_link, file_name));
-                    }
-
-                    return bitmap;
-                }
-
-                public void run() {
-                    final Bitmap b = loadImage();
-
-                    runOnUiThread(new Runnable() {
-                                      @Override
-                                      public void run() {
-                                          mImageView.setImageBitmap(b);
-                                      }
-                                  }
-                    );
-                }
-            }).start();
-        }
+        mImageView = (ImageView) findViewById(R.id.icon);
     }
 
     @Override
@@ -149,45 +61,46 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void next_page()
-    {
-        current_page_number++;
-    }
-
-    private void previous_page()
-    {
-        if (current_page_number > 1)
-            current_page_number--;
-    }
-
-    private float x1,x2;
-    static final int MIN_DISTANCE = 150;
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event){
-
-        int action = MotionEventCompat.getActionMasked(event);
-
-        switch(action) {
-            case MotionEvent.ACTION_DOWN:
-                x1 = event.getX();
-                break;
-            case MotionEvent.ACTION_UP:
-                x2 = event.getX();
-                float deltaX = x2 - x1;
-                if (Math.abs(deltaX) > MIN_DISTANCE) {
-                    if (x2 < x1) {
-                        next_page();
-                    } else {
-                        previous_page();
-                    }
-                    //Toast.makeText(this, "left2right swipe", Toast.LENGTH_SHORT).show ();
-                    new DownloadImage().execute();
-                }
-                break;
-            default:
-                break;
+    private void setUpGameList() {
+        if (comicList == null) {
+            comicList = new ArrayList();
         }
-        return super.onTouchEvent(event);
+
+//        List<Integer> thumbList = Arrays.asList(R.drawable.thumb1, R.drawable.thumb2, R.drawable.thumb3,
+//            R.drawable.thumb4, R.drawable.thumb5, R.drawable.thumb6, R.drawable.thumb7, R.drawable.thumb8, R.drawable.thumb9);
+
+        for (int i = 1; i < 30; i++) {
+            ComicData game = new ComicData();
+            game.setgameName("Big Shot Comics " + i);
+//            game.setIcon(thumbList.get(i / 2));
+            String thumbImageUrl;
+            if(i<10)
+                thumbImageUrl = "https://dl.dropboxusercontent.com/u/21785336/Big_Shot_Comics_005/t/00"+i+".jpg";
+            else
+                thumbImageUrl = "https://dl.dropboxusercontent.com/u/21785336/Big_Shot_Comics_005/t/0"+i+".jpg";
+
+            game.setImageUrl(thumbImageUrl);
+
+            Log.e("Ambuj ", thumbImageUrl);
+
+            comicList.add(game);
+        }
+        mAdapter = new AllGamesAdapter(comicList);
+        mRecyclerView.setAdapter(mAdapter);
+    }
+
+    public class SpacesItemDecoration extends RecyclerView.ItemDecoration {
+        private int space;
+
+        public SpacesItemDecoration(int space) {
+            this.space = space;
+        }
+
+        @Override
+        public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+            outRect.left = space;
+            outRect.right = space;
+            outRect.bottom = space;
+        }
     }
 }
