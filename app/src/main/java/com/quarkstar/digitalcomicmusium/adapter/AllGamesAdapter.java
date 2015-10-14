@@ -1,7 +1,6 @@
 package com.quarkstar.digitalcomicmusium.adapter;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -11,15 +10,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import com.quarkstar.digitalcomicmusium.ComicActivity;
 import com.quarkstar.digitalcomicmusium.R;
 
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
-
-import static android.support.v4.app.ActivityCompat.startActivity;
 
 public class AllGamesAdapter extends RecyclerView.Adapter<AllGamesAdapter.AllGamesGridHolder> {
 
@@ -59,7 +55,7 @@ public class AllGamesAdapter extends RecyclerView.Adapter<AllGamesAdapter.AllGam
 
             @Override
             protected Bitmap doInBackground(Void... params) {
-                try {0
+                try {
                     URL urlConnection = new URL(url);
                     HttpURLConnection connection = (HttpURLConnection) urlConnection.openConnection();
                     connection.setDoInput(true);
@@ -104,8 +100,8 @@ public class AllGamesAdapter extends RecyclerView.Adapter<AllGamesAdapter.AllGam
 
         @Override
         public void onClick(View v) {
-            Intent intent = new Intent(mContext, ComicActivity.class);
-            startActivity(intent);
+//            Intent intent = new Intent(mContext, ComicActivity.class);
+//            startActivity(intent);
 
         }
 
