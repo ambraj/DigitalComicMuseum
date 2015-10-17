@@ -18,9 +18,8 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    ImageView mImageView;
+    private ImageView mImageView;
     private RecyclerView mRecyclerView;
-    private AllGamesAdapter mAdapter;
     private List<ComicData> comicList = new ArrayList<>();
 
     @Override
@@ -85,12 +84,12 @@ public class MainActivity extends AppCompatActivity {
 
             comicList.add(game);
         }
-        mAdapter = new AllGamesAdapter(comicList);
+        AllGamesAdapter mAdapter = new AllGamesAdapter(comicList);
         mRecyclerView.setAdapter(mAdapter);
     }
 
     public class SpacesItemDecoration extends RecyclerView.ItemDecoration {
-        private int space;
+        private final int space;
 
         public SpacesItemDecoration(int space) {
             this.space = space;
