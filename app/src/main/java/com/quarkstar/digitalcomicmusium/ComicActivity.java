@@ -18,10 +18,10 @@ import java.net.URL;
 
 public class ComicActivity extends AppCompatActivity {
 
-    ImageView mImageView;
+    private ImageView mImageView;
     String DEBUG_TAG = "My app";
 
-    int current_page_number = 1;
+    private int current_page_number = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +42,7 @@ public class ComicActivity extends AppCompatActivity {
         new DownloadImage().execute();
     }
 
-    class DownloadImage extends AsyncTask<String, Void, String> {
+    private class DownloadImage extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
@@ -160,8 +160,8 @@ public class ComicActivity extends AppCompatActivity {
             current_page_number--;
     }
 
-    private float x1,x2;
-    static final int MIN_DISTANCE = 150;
+    private float x1;
+    private static final int MIN_DISTANCE = 150;
 
     @Override
     public boolean onTouchEvent(MotionEvent event){
@@ -173,7 +173,7 @@ public class ComicActivity extends AppCompatActivity {
                 x1 = event.getX();
                 break;
             case MotionEvent.ACTION_UP:
-                x2 = event.getX();
+                float x2 = event.getX();
                 float deltaX = x2 - x1;
                 if (Math.abs(deltaX) > MIN_DISTANCE) {
                     if (x2 < x1) {

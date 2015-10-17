@@ -19,7 +19,7 @@ import java.util.List;
 
 public class AllGamesAdapter extends RecyclerView.Adapter<AllGamesAdapter.AllGamesGridHolder> {
 
-    private List<ComicData> allGamesList;
+    private final List<ComicData> allGamesList;
 
     private Context mContext;
 
@@ -31,8 +31,7 @@ public class AllGamesAdapter extends RecyclerView.Adapter<AllGamesAdapter.AllGam
     public AllGamesGridHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.comic_grid_item, null);
         mContext = viewGroup.getContext();
-        AllGamesGridHolder ml = new AllGamesGridHolder(v);
-        return ml;
+        return new AllGamesGridHolder(v);
     }
 
     @Override
@@ -61,8 +60,7 @@ public class AllGamesAdapter extends RecyclerView.Adapter<AllGamesAdapter.AllGam
                     connection.setDoInput(true);
                     connection.connect();
                     InputStream input = connection.getInputStream();
-                    Bitmap myBitmap = BitmapFactory.decodeStream(input);
-                    return myBitmap;
+                    return BitmapFactory.decodeStream(input);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -87,8 +85,8 @@ public class AllGamesAdapter extends RecyclerView.Adapter<AllGamesAdapter.AllGam
     }
 
     public class AllGamesGridHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        protected ImageView icon;
-        protected TextView game;
+        final ImageView icon;
+        final TextView game;
 
         public AllGamesGridHolder(View view) {
             super(view);

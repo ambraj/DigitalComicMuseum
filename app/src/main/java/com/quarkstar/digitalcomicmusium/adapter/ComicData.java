@@ -2,8 +2,8 @@ package com.quarkstar.digitalcomicmusium.adapter;
 
 public class ComicData {
 //    int icon;
-    String imageUrl;
-    String gameName;
+private String imageUrl;
+    private String gameName;
 
     public String getImageUrl() {
         return imageUrl;
