@@ -26,6 +26,7 @@ public class ComicActivity extends AppCompatActivity {
     private ImageView mImageView;
     private int current_page_number = 5;
     private float x1;
+    boolean scaleFlag;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,37 +43,50 @@ public class ComicActivity extends AppCompatActivity {
         getWindow().getDecorView().setSystemUiVisibility(mUIFlag);
 
         mImageView = (ImageView) findViewById(R.id.imageView);
+        scaleFlag = false;
 
         mImageView.setOnTouchListener(new OnSwipeTouchListener(ComicActivity.this) {
 
             @Override
             public void onDoubleTapScreen() {
-                Toast.makeText(ComicActivity.this, "Double Tap", Toast.LENGTH_SHORT).show();
 
-                ScaleAnimation fade_in =  new ScaleAnimation(1f, 2f, 1f, 2f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-                fade_in.setDuration(1000);     // animation duration in milliseconds
+                ScaleAnimation fade_in;
+
+                if(!scaleFlag){
+                    scaleFlag = true;
+                    fade_in =  new ScaleAnimation(1f, 2f, 1f, 2f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+                    Toast.makeText(ComicActivity.this, "Double Tap : "+mImageView.getScaleX(), Toast.LENGTH_SHORT).show();
+                } else {
+                    scaleFlag = false;
+                    fade_in =  new ScaleAnimation(2f, 1f, 2f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+                    Toast.makeText(ComicActivity.this, "Double Tap : "+mImageView.getScaleX(), Toast.LENGTH_SHORT).show();
+                }
+
+
+                fade_in.setDuration(500);     // animation duration in milliseconds
                 fade_in.setFillAfter(true);    // If fillAfter is true, the transformation that this animation performed will persist when it is finished.
                 mImageView.startAnimation(fade_in);
             }
 
             public void onSwipeRight() {
+                scaleFlag = false;
                 Toast.makeText(ComicActivity.this, "right", Toast.LENGTH_SHORT).show();
                 ScaleAnimation fade_in =  new ScaleAnimation(1f, 1f, 1f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-//                fade_in.setDuration(1000);     // animation duration in milliseconds
+                fade_in.setDuration(500);     // animation duration in milliseconds
 //                fade_in.setFillAfter(true);    // If fillAfter is true, the transformation that this animation performed will persist when it is finished.
-                fade_in.reset();
                 mImageView.startAnimation(fade_in);
 
                 previous_page();
                 new DownloadImage().execute();
             }
             public void onSwipeLeft() {
+                scaleFlag = false;
                 Toast.makeText(ComicActivity.this, "left", Toast.LENGTH_SHORT).show();
 
                 ScaleAnimation fade_in =  new ScaleAnimation(1f, 1f, 1f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-//                fade_in.setDuration(1000);     // animation duration in milliseconds
+                fade_in.setDuration(500);     // animation duration in milliseconds
 //                fade_in.setFillAfter(true);    // If fillAfter is true, the transformation that this animation performed will persist when it is finished.
-                fade_in.reset();
+                mImageView.startAnimation(fade_in);
 
                 next_page();
                 new DownloadImage().execute();
