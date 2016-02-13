@@ -1,110 +1,83 @@
 package com.quarkstar.digitalcomicmusium.adapter;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import com.quarkstar.digitalcomicmusium.ComicActivity;
 import com.quarkstar.digitalcomicmusium.R;
+import com.squareup.picasso.Picasso;
 
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.List;
 
-public class AllGamesAdapter extends RecyclerView.Adapter<AllGamesAdapter.AllGamesGridHolder> {
+public class AllGamesAdapter extends RecyclerView.Adapter<AllGamesAdapter.CustomViewHolder> {
 
-    private final List<ComicData> allGamesList;
-
+    private List<ComicData> feedItemList;
     private Context mContext;
 
-    public AllGamesAdapter(List<ComicData> allGamesList) {
-        this.allGamesList = allGamesList;
+    public AllGamesAdapter(Context context, List<ComicData> feedItemList) {
+        this.feedItemList = feedItemList;
+        this.mContext = context;
     }
 
     @Override
-    public AllGamesGridHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-        View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.comic_grid_item, null);
-        mContext = viewGroup.getContext();
-        return new AllGamesGridHolder(v);
+    public CustomViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.comic_grid_item, null);
+
+        CustomViewHolder viewHolder = new CustomViewHolder(view);
+        return viewHolder;
     }
 
     @Override
-    public void onBindViewHolder(AllGamesGridHolder allGamesGridHolder, int i) {
-        ComicData allGamesItem = allGamesList.get(i);
+    public void onBindViewHolder(CustomViewHolder customViewHolder, int i) {
+        ComicData feedItem = feedItemList.get(i);
 
-//        allGamesGridHolder.icon.setImageResource(allGamesItem.getIcon());
-//        allGamesGridHolder.icon.setImageURI();
-        allGamesGridHolder.game.setText(allGamesItem.getGameName());
+        Log.e("imageURL", feedItem.getImageUrl());
+        //Download image using picasso library
 
-        class ImageLoadTask extends AsyncTask<Void, Void, Bitmap> {
+        String thumbImageUrl;
+        if (i < 10)
+            thumbImageUrl = "https://dl.dropboxusercontent.com/u/21785336/Big_Shot_Comics_005/t/00" + i + ".jpg";
+        else
+            thumbImageUrl = "https://dl.dropboxusercontent.com/u/21785336/Big_Shot_Comics_005/t/0" + i + ".jpg";
 
-            private String url;
-            private ImageView imageView;
 
-            public ImageLoadTask(String url, ImageView imageView) {
-                this.url = url;
-                this.imageView = imageView;
-            }
+        Picasso.with(mContext).load(thumbImageUrl).into(customViewHolder.icon);
 
-            @Override
-            protected Bitmap doInBackground(Void... params) {
-                try {
-                    URL urlConnection = new URL(url);
-                    HttpURLConnection connection = (HttpURLConnection) urlConnection.openConnection();
-                    connection.setDoInput(true);
-                    connection.connect();
-                    InputStream input = connection.getInputStream();
-                    return BitmapFactory.decodeStream(input);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Bitmap result) {
-                super.onPostExecute(result);
-                imageView.setImageBitmap(result);
-            }
-
-        }
-
-        new ImageLoadTask(allGamesItem.getImageUrl(), allGamesGridHolder.icon).execute();
-
+        //Setting text view title
+        customViewHolder.game.setText("Comic " + i);
     }
 
     @Override
     public int getItemCount() {
-        return (null != allGamesList ? allGamesList.size() : 0);
+        return (null != feedItemList ? feedItemList.size() : 0);
     }
 
-    public class AllGamesGridHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class CustomViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         final ImageView icon;
         final TextView game;
 
-        public AllGamesGridHolder(View view) {
+        public CustomViewHolder(View view) {
             super(view);
-            this.icon = (ImageView) view.findViewById(R.id.icon);
-            this.game = (TextView) view.findViewById(R.id.comic);
-
+            this.icon = (ImageView) view.findViewById(R.id.comic_thumbnail);
+            this.game = (TextView) view.findViewById(R.id.comic_title);
             view.setOnClickListener(this);
         }
 
+
         @Override
         public void onClick(View v) {
-//            Intent intent = new Intent(mContext, ComicActivity.class);
-//            startActivity(intent);
-
+            Intent intent = new Intent(mContext, ComicActivity.class);
+//            ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(Ma, Pair.create((View)icon, "cover"),Pair.create((View)icon, "icon"));
+            mContext.startActivity(intent);
         }
 
     }
-
 
 }
 
