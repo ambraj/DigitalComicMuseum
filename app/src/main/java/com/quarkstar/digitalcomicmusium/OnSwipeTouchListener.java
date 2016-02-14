@@ -37,6 +37,12 @@ public class OnSwipeTouchListener implements OnTouchListener {
         }
 
         @Override
+        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+            onImageScroll(e1, e2, distanceX, distanceY);
+            return super.onScroll(e1, e2, distanceX, distanceY);
+        }
+
+        @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
             boolean result = false;
             try {
@@ -57,6 +63,9 @@ public class OnSwipeTouchListener implements OnTouchListener {
             }
             return result;
         }
+    }
+
+    public void onImageScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY){
     }
 
     public void onDoubleTapScreen(){

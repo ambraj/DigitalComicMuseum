@@ -1,160 +1,128 @@
+/*******************************************************************************
+ * Copyright 2011, 2012 Chris Banes.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *******************************************************************************/
 package com.quarkstar.digitalcomicmusium;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.annotation.NonNull;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.ScaleAnimation;
+import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
+import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.Toast;
+import uk.co.senab.photoview.PhotoView;
 
 import java.io.*;
 import java.net.URL;
 
-public class ComicActivity extends AppCompatActivity {
+/**
+ * Lock/Unlock button is added to the ActionBar.
+ * Use it to temporarily disable ViewPager navigation in order to correctly interact with ImageView by gestures.
+ * Lock/Unlock state of ViewPager is saved and restored on configuration changes.
+ *
+ * Julia Zudikova
+ */
 
-    private static final int MIN_DISTANCE = 150;
-    private static String TAG = "Ambuj";
-    String DEBUG_TAG = "My app";
+public class ComicActivity extends Activity {
+
+    private static final String ISLOCKED_ARG = "isLocked";
     private ImageView mImageView;
-    private int current_page_number = 5;
-    private float x1;
-    boolean scaleFlag;
+    int picPosition;
+    Bitmap bitmapComic;
+
+    private ViewPager mViewPager;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comic);
+        mViewPager = (HackyViewPager) findViewById(R.id.view_pager);
+        setContentView(mViewPager);
 
-        int mUIFlag = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-            | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-            | View.SYSTEM_UI_FLAG_LOW_PROFILE
-            | View.SYSTEM_UI_FLAG_FULLSCREEN
-            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+        mViewPager.setAdapter(new SamplePagerAdapter());
 
-        getWindow().getDecorView().setSystemUiVisibility(mUIFlag);
-
-        mImageView = (ImageView) findViewById(R.id.imageView);
-        scaleFlag = false;
-
-        mImageView.setOnTouchListener(new OnSwipeTouchListener(ComicActivity.this) {
-
-            @Override
-            public void onDoubleTapScreen() {
-
-                ScaleAnimation fade_in;
-
-                if(!scaleFlag){
-                    scaleFlag = true;
-                    fade_in =  new ScaleAnimation(1f, 2f, 1f, 2f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-                    Toast.makeText(ComicActivity.this, "Double Tap : "+mImageView.getScaleX(), Toast.LENGTH_SHORT).show();
-                } else {
-                    scaleFlag = false;
-                    fade_in =  new ScaleAnimation(2f, 1f, 2f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-                    Toast.makeText(ComicActivity.this, "Double Tap : "+mImageView.getScaleX(), Toast.LENGTH_SHORT).show();
-                }
-
-
-                fade_in.setDuration(500);     // animation duration in milliseconds
-                fade_in.setFillAfter(true);    // If fillAfter is true, the transformation that this animation performed will persist when it is finished.
-                mImageView.startAnimation(fade_in);
-            }
-
-            public void onSwipeRight() {
-                scaleFlag = false;
-                Toast.makeText(ComicActivity.this, "right", Toast.LENGTH_SHORT).show();
-                ScaleAnimation fade_in =  new ScaleAnimation(1f, 1f, 1f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-                fade_in.setDuration(500);     // animation duration in milliseconds
-//                fade_in.setFillAfter(true);    // If fillAfter is true, the transformation that this animation performed will persist when it is finished.
-                mImageView.startAnimation(fade_in);
-
-                previous_page();
-                new DownloadImage().execute();
-            }
-            public void onSwipeLeft() {
-                scaleFlag = false;
-                Toast.makeText(ComicActivity.this, "left", Toast.LENGTH_SHORT).show();
-
-                ScaleAnimation fade_in =  new ScaleAnimation(1f, 1f, 1f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-                fade_in.setDuration(500);     // animation duration in milliseconds
-//                fade_in.setFillAfter(true);    // If fillAfter is true, the transformation that this animation performed will persist when it is finished.
-                mImageView.startAnimation(fade_in);
-
-                next_page();
-                new DownloadImage().execute();
-            }
-
-        });
-
-        new DownloadImage().execute();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (savedInstanceState != null) {
+            boolean isLocked = savedInstanceState.getBoolean(ISLOCKED_ARG, false);
+            ((HackyViewPager) mViewPager).setLocked(isLocked);
         }
 
-        return super.onOptionsItemSelected(item);
+//        View decorView = getWindow().getDecorView();
+//// Hide the status bar.
+//        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+//        decorView.setSystemUiVisibility(uiOptions);
+//// Remember that you should never show the action bar if the
+//// status bar is hidden, so hide that too if necessary.
+//        ActionBar actionBar = getActionBar();
+//        actionBar.hide();
     }
 
-    private void next_page() {
-        current_page_number++;
+     class SamplePagerAdapter extends PagerAdapter {
+
+        @Override
+        public int getCount() {
+            return 27;
+        }
+
+        @Override
+        public View instantiateItem(ViewGroup container, int position) {
+            picPosition = position;
+            new DownloadImage().execute();
+            PhotoView photoView = new PhotoView(container.getContext());
+//            photoView.setImageResource(sDrawables[position]);
+            photoView.setImageBitmap(bitmapComic);
+
+            // Now just add PhotoView to ViewPager and return it
+            container.addView(photoView, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+
+            return photoView;
+        }
+
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+            container.removeView((View) object);
+        }
+
+        @Override
+        public boolean isViewFromObject(View view, Object object) {
+            return view == object;
+        }
+
     }
 
-    private void previous_page() {
-        if (current_page_number > 1)
-            current_page_number--;
+    private boolean isViewPagerActive() {
+        return (mViewPager != null && mViewPager instanceof HackyViewPager);
     }
 
-//    @Override
-//    public boolean onTouchEvent(MotionEvent event) {
-//
-//        int action = MotionEventCompat.getActionMasked(event);
-//
-//        switch (action) {
-//            case MotionEvent.ACTION_DOWN:
-//                x1 = event.getX();
-//                break;
-//            case MotionEvent.ACTION_UP:
-//                float x2 = event.getX();
-//                float deltaX = x2 - x1;
-//                if (Math.abs(deltaX) > MIN_DISTANCE) {
-//                    if (x2 < x1) {
-//                        next_page();
-//                    } else {
-//                        previous_page();
-//                    }
-//                    //Toast.makeText(this, "left2right swipe", Toast.LENGTH_SHORT).show ();
-//                    new DownloadImage().execute();
-//                }
-//                break;
-//            default:
-//                break;
-//        }
-//        return super.onTouchEvent(event);
-//    }
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        if (isViewPagerActive()) {
+            outState.putBoolean(ISLOCKED_ARG, ((HackyViewPager) mViewPager).isLocked());
+        }
+        super.onSaveInstanceState(outState);
+    }
 
     private class DownloadImage extends AsyncTask<String, Void, String> {
 
@@ -215,7 +183,7 @@ public class ComicActivity extends AppCompatActivity {
                 private Bitmap loadImage() {
                     String comic_name = getResources().getString(R.string.comic_1);
                     String comic_link = getResources().getString(R.string.url_comic);
-                    String file_name = String.format("%03d", current_page_number) + ".jpg";
+                    String file_name = String.format("%03d", picPosition) + ".jpg";
                     Log.e("filename: ", file_name);
                     Bitmap bitmap = loadImageFromStorage(getImageNameLocal(comic_name, comic_link, file_name));
                     if (bitmap == null) {
@@ -236,7 +204,9 @@ public class ComicActivity extends AppCompatActivity {
 //                                              int id = getResources().getIdentifier("res:drawable/thumb_not_available.jpg", null, null);
 //                                              mImageView.setImageResource(id);
 //                                          } else {
-                                          mImageView.setImageBitmap(b);
+                                          bitmapComic = b;
+
+                                          getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 //                                          }
                                       }
                                   }
@@ -245,4 +215,5 @@ public class ComicActivity extends AppCompatActivity {
             }).start();
         }
     }
+
 }
