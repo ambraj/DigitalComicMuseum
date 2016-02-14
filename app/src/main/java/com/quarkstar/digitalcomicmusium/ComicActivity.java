@@ -28,7 +28,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
-import android.view.WindowManager;
 import android.widget.ImageView;
 import uk.co.senab.photoview.PhotoView;
 
@@ -66,14 +65,10 @@ public class ComicActivity extends Activity {
             ((HackyViewPager) mViewPager).setLocked(isLocked);
         }
 
-//        View decorView = getWindow().getDecorView();
-//// Hide the status bar.
-//        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
-//        decorView.setSystemUiVisibility(uiOptions);
-//// Remember that you should never show the action bar if the
-//// status bar is hidden, so hide that too if necessary.
-//        ActionBar actionBar = getActionBar();
-//        actionBar.hide();
+        // hide the status bar
+        View decorView = getWindow().getDecorView();
+        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+        decorView.setSystemUiVisibility(uiOptions);
     }
 
      class SamplePagerAdapter extends PagerAdapter {
@@ -88,14 +83,10 @@ public class ComicActivity extends Activity {
             picPosition = position;
             new DownloadImage().execute();
             PhotoView photoView = new PhotoView(container.getContext());
-//            photoView.setImageResource(sDrawables[position]);
             photoView.setImageBitmap(bitmapComic);
 
             // Now just add PhotoView to ViewPager and return it
             container.addView(photoView, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-
-            getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
             return photoView;
         }
@@ -181,9 +172,9 @@ public class ComicActivity extends Activity {
                 }
 
                 private Bitmap loadImage() {
-                    String comic_name = getResources().getString(R.string.comic_1);
+                    String comic_name = getResources().getString(R.string.comic_3);
                     String comic_link = getResources().getString(R.string.url_comic);
-                    String file_name = String.format("%03d", picPosition) + ".jpg";
+                    String file_name = String.format("%03d", (picPosition)) + ".jpg";
                     Log.e("filename: ", file_name);
                     Bitmap bitmap = loadImageFromStorage(getImageNameLocal(comic_name, comic_link, file_name));
                     if (bitmap == null) {
@@ -205,8 +196,6 @@ public class ComicActivity extends Activity {
 //                                              mImageView.setImageResource(id);
 //                                          } else {
                                           bitmapComic = b;
-
-                                          getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 //                                          }
                                       }
                                   }
