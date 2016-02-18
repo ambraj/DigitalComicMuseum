@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         for (int i = 1; i < 30; i++) {
-            thumbImageUrl = "https://dl.dropboxusercontent.com/u/21785336/Big_Shot_Comics_005/t/0" + ((i < 10) ? "0" : "") + i + ".jpg";
+            thumbImageUrl = "https://dl.dropboxusercontent.com/u/21785336/Big Shot Comics/t/0" + ((i < 10) ? "0" : "") + i + ".jpg";
 
             ComicData game = new ComicData();
             game.setgameName("Big Shot Comics " + i);
@@ -87,4 +87,5 @@ public class MainActivity extends AppCompatActivity {
             outRect.bottom = space;
         }
     }
+
 }

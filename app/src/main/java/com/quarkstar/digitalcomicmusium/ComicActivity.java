@@ -1,248 +1,109 @@
+/*******************************************************************************
+ * Copyright 2011, 2012 Chris Banes.
+ * <p/>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p/>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p/>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *******************************************************************************/
 package com.quarkstar.digitalcomicmusium;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
+import android.app.Activity;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.annotation.NonNull;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.ScaleAnimation;
+import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageView;
-import android.widget.Toast;
+import com.squareup.picasso.Picasso;
+import uk.co.senab.photoview.PhotoView;
 
-import java.io.*;
-import java.net.URL;
+public class ComicActivity extends Activity {
 
-public class ComicActivity extends AppCompatActivity {
-
-    private static final int MIN_DISTANCE = 150;
-    private static String TAG = "Ambuj";
-    String DEBUG_TAG = "My app";
-    private ImageView mImageView;
-    private int current_page_number = 5;
-    private float x1;
-    boolean scaleFlag;
+    private static final String ISLOCKED_ARG = "isLocked";
+    int picPosition;
+    private ViewPager mViewPager;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comic);
+        mViewPager = (HackyViewPager) findViewById(R.id.view_pager);
+        setContentView(mViewPager);
 
-        int mUIFlag = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-            | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-            | View.SYSTEM_UI_FLAG_LOW_PROFILE
-            | View.SYSTEM_UI_FLAG_FULLSCREEN
-            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+        mViewPager.setAdapter(new SamplePagerAdapter());
 
-        getWindow().getDecorView().setSystemUiVisibility(mUIFlag);
+        if (savedInstanceState != null) {
+            boolean isLocked = savedInstanceState.getBoolean(ISLOCKED_ARG, false);
+            ((HackyViewPager) mViewPager).setLocked(isLocked);
+        }
 
-        mImageView = (ImageView) findViewById(R.id.imageView);
-        scaleFlag = false;
+        // hide the status bar
+        View decorView = getWindow().getDecorView();
+        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+        decorView.setSystemUiVisibility(uiOptions);
+    }
 
-        mImageView.setOnTouchListener(new OnSwipeTouchListener(ComicActivity.this) {
-
-            @Override
-            public void onDoubleTapScreen() {
-
-                ScaleAnimation fade_in;
-
-                if(!scaleFlag){
-                    scaleFlag = true;
-                    fade_in =  new ScaleAnimation(1f, 2f, 1f, 2f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-                    Toast.makeText(ComicActivity.this, "Double Tap : "+mImageView.getScaleX(), Toast.LENGTH_SHORT).show();
-                } else {
-                    scaleFlag = false;
-                    fade_in =  new ScaleAnimation(2f, 1f, 2f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-                    Toast.makeText(ComicActivity.this, "Double Tap : "+mImageView.getScaleX(), Toast.LENGTH_SHORT).show();
-                }
-
-
-                fade_in.setDuration(500);     // animation duration in milliseconds
-                fade_in.setFillAfter(true);    // If fillAfter is true, the transformation that this animation performed will persist when it is finished.
-                mImageView.startAnimation(fade_in);
-            }
-
-            public void onSwipeRight() {
-                scaleFlag = false;
-                Toast.makeText(ComicActivity.this, "right", Toast.LENGTH_SHORT).show();
-                ScaleAnimation fade_in =  new ScaleAnimation(1f, 1f, 1f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-                fade_in.setDuration(500);     // animation duration in milliseconds
-//                fade_in.setFillAfter(true);    // If fillAfter is true, the transformation that this animation performed will persist when it is finished.
-                mImageView.startAnimation(fade_in);
-
-                previous_page();
-                new DownloadImage().execute();
-            }
-            public void onSwipeLeft() {
-                scaleFlag = false;
-                Toast.makeText(ComicActivity.this, "left", Toast.LENGTH_SHORT).show();
-
-                ScaleAnimation fade_in =  new ScaleAnimation(1f, 1f, 1f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-                fade_in.setDuration(500);     // animation duration in milliseconds
-//                fade_in.setFillAfter(true);    // If fillAfter is true, the transformation that this animation performed will persist when it is finished.
-                mImageView.startAnimation(fade_in);
-
-                next_page();
-                new DownloadImage().execute();
-            }
-
-        });
-
-        new DownloadImage().execute();
+    private boolean isViewPagerActive() {
+        return (mViewPager != null && mViewPager instanceof HackyViewPager);
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        if (isViewPagerActive()) {
+            outState.putBoolean(ISLOCKED_ARG, ((HackyViewPager) mViewPager).isLocked());
         }
-
-        return super.onOptionsItemSelected(item);
+        super.onSaveInstanceState(outState);
     }
 
-    private void next_page() {
-        current_page_number++;
+    private String getImageUrl(String comic_name, String comic_link, String file_name) {
+        String imageUrl = getResources().getString(R.string.base_url) + "/" + comic_name + "/" + comic_link + "/" + file_name;
+        Log.e("getImageUrl: ", imageUrl);
+        return imageUrl;
     }
 
-    private void previous_page() {
-        if (current_page_number > 1)
-            current_page_number--;
-    }
-
-//    @Override
-//    public boolean onTouchEvent(MotionEvent event) {
-//
-//        int action = MotionEventCompat.getActionMasked(event);
-//
-//        switch (action) {
-//            case MotionEvent.ACTION_DOWN:
-//                x1 = event.getX();
-//                break;
-//            case MotionEvent.ACTION_UP:
-//                float x2 = event.getX();
-//                float deltaX = x2 - x1;
-//                if (Math.abs(deltaX) > MIN_DISTANCE) {
-//                    if (x2 < x1) {
-//                        next_page();
-//                    } else {
-//                        previous_page();
-//                    }
-//                    //Toast.makeText(this, "left2right swipe", Toast.LENGTH_SHORT).show ();
-//                    new DownloadImage().execute();
-//                }
-//                break;
-//            default:
-//                break;
-//        }
-//        return super.onTouchEvent(event);
-//    }
-
-    private class DownloadImage extends AsyncTask<String, Void, String> {
+    class SamplePagerAdapter extends PagerAdapter {
 
         @Override
-        protected String doInBackground(String... params) {
-            return null;
+        public int getCount() {
+            return 27;
         }
 
-        // onPostExecute displays the results of the AsyncTask.
         @Override
-        protected void onPostExecute(String result) {
+        public View instantiateItem(ViewGroup container, int position) {
+            picPosition = position;
+            String comic_name = getResources().getString(R.string.comic_3);
+            String comic_link = getResources().getString(R.string.url_comic);
+            String file_name = String.format("%03d", (position)) + ".jpg";
 
-            new Thread(new Runnable() {
+            ImageView mImageView = new PhotoView(container.getContext());
+            Picasso.with(container.getContext()).load(getImageUrl(comic_name, comic_link, file_name)).into(mImageView);
 
-                private void storeImage(Bitmap image, String image_name) {
-                    FileOutputStream outputStream;
+            container.addView(mImageView, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 
-                    try {
-                        outputStream = openFileOutput(image_name, Context.MODE_PRIVATE);
-                        image.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
-                        outputStream.close();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                private Bitmap loadImageFromStorage(String image_name) {
-                    try {
-                        File f = new File(getApplicationContext().getFilesDir(), image_name);
-                        return BitmapFactory.decodeStream(new FileInputStream(f));
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    }
-                    return null;
-                }
-
-                private Bitmap loadImageFromNetwork(String url, String image_name) {
-                    try {
-                        Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL(url).getContent());
-                        storeImage(bitmap, image_name);
-                        return bitmap;
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    return null;
-                }
-
-                private String getImageUrl(String comic_name, String comic_link, String file_name) {
-                    String imageUrl = getResources().getString(R.string.base_url) + "/" + comic_name + "/" + comic_link + "/" + file_name;
-                    Log.e("getImageUrl: ", imageUrl);
-                    return imageUrl;
-                }
-
-                private String getImageNameLocal(String comic_name, String comic_link, String file_name) {
-                    return comic_name + "_" + comic_link + "_" + file_name;
-                }
-
-                private Bitmap loadImage() {
-                    String comic_name = getResources().getString(R.string.comic_1);
-                    String comic_link = getResources().getString(R.string.url_comic);
-                    String file_name = String.format("%03d", current_page_number) + ".jpg";
-                    Log.e("filename: ", file_name);
-                    Bitmap bitmap = loadImageFromStorage(getImageNameLocal(comic_name, comic_link, file_name));
-                    if (bitmap == null) {
-                        bitmap = loadImageFromNetwork(getImageUrl(comic_name, comic_link, file_name), getImageNameLocal(comic_name, comic_link, file_name));
-                    }
-
-                    return bitmap;
-                }
-
-                public void run() {
-                    final Bitmap b = loadImage();
-
-                    runOnUiThread(new Runnable() {
-                                      @Override
-
-                                      public void run() {
-//                                          if (b == null) {
-//                                              int id = getResources().getIdentifier("res:drawable/thumb_not_available.jpg", null, null);
-//                                              mImageView.setImageResource(id);
-//                                          } else {
-                                          mImageView.setImageBitmap(b);
-//                                          }
-                                      }
-                                  }
-                    );
-                }
-            }).start();
+            return mImageView;
         }
+
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+            container.removeView((View) object);
+        }
+
+        @Override
+        public boolean isViewFromObject(View view, Object object) {
+            return view == object;
+        }
+
     }
+
 }
