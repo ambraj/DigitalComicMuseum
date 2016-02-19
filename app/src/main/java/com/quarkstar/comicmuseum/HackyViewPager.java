@@ -1,4 +1,4 @@
-package com.quarkstar.digitalcomicmusium;
+package com.quarkstar.comicmuseum;
 
 import android.content.Context;
 import android.support.v4.view.ViewPager;
