@@ -1,24 +1,22 @@
-package com.quarkstar.digitalcomicmusium;
+package com.quarkstar.comicmuseum;
 
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
-import com.quarkstar.digitalcomicmusium.adapter.AllGamesAdapter;
-import com.quarkstar.digitalcomicmusium.adapter.ComicData;
+import com.quarkstar.comicmuseum.adapter.AllGamesAdapter;
+import com.quarkstar.comicmuseum.adapter.ComicData;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ImageView mImageView;
+    String thumbImageUrl;
     private RecyclerView mRecyclerView;
     private List<ComicData> comicList = new ArrayList<>();
 
@@ -34,8 +32,6 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView.setHasFixedSize(true);
 
         setUpGameList();
-
-        mImageView = (ImageView) findViewById(R.id.icon);
     }
 
     @Override
@@ -65,26 +61,15 @@ public class MainActivity extends AppCompatActivity {
             comicList = new ArrayList();
         }
 
-//        List<Integer> thumbList = Arrays.asList(R.drawable.thumb1, R.drawable.thumb2, R.drawable.thumb3,
-//            R.drawable.thumb4, R.drawable.thumb5, R.drawable.thumb6, R.drawable.thumb7, R.drawable.thumb8, R.drawable.thumb9);
-
         for (int i = 1; i < 30; i++) {
+            thumbImageUrl = "https://dl.dropboxusercontent.com/u/21785336/Big Shot Comics/t/0" + ((i < 10) ? "0" : "") + i + ".jpg";
+
             ComicData game = new ComicData();
             game.setgameName("Big Shot Comics " + i);
-//            game.setIcon(thumbList.get(i / 2));
-            String thumbImageUrl;
-            if(i<10)
-                thumbImageUrl = "https://dl.dropboxusercontent.com/u/21785336/Big_Shot_Comics_005/t/00"+i+".jpg";
-            else
-                thumbImageUrl = "https://dl.dropboxusercontent.com/u/21785336/Big_Shot_Comics_005/t/0"+i+".jpg";
-
             game.setImageUrl(thumbImageUrl);
-
-            Log.e("Ambuj ", thumbImageUrl);
-
             comicList.add(game);
         }
-        AllGamesAdapter mAdapter = new AllGamesAdapter(comicList);
+        AllGamesAdapter mAdapter = new AllGamesAdapter(MainActivity.this, comicList);
         mRecyclerView.setAdapter(mAdapter);
     }
 
@@ -102,4 +87,5 @@ public class MainActivity extends AppCompatActivity {
             outRect.bottom = space;
         }
     }
+
 }
