@@ -1,4 +1,4 @@
-package com.quarkstar.digitalcomicmusium.adapter;
+package com.quarkstar.comicmuseum.adapter;
 
 public class ComicData {
     private String imageUrl;
