@@ -46,10 +46,8 @@ public class AllGamesAdapter extends RecyclerView.Adapter<AllGamesAdapter.Custom
         else
             thumbImageUrl = "https://dl.dropboxusercontent.com/u/21785336/Big_Shot_Comics_005/t/0" + i + ".jpg";
 
-
         Picasso.with(mContext).load(thumbImageUrl).into(customViewHolder.icon);
 
-        //Setting text view title
         customViewHolder.game.setText("Comic " + i);
     }
 
