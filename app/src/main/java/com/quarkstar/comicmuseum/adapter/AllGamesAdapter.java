@@ -1,4 +1,4 @@
-package com.quarkstar.digitalcomicmusium.adapter;
+package com.quarkstar.comicmuseum.adapter;
 
 import android.content.Context;
 import android.content.Intent;
@@ -9,8 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import com.quarkstar.digitalcomicmusium.ComicActivity;
-import com.quarkstar.digitalcomicmusium.R;
+import com.quarkstar.comicmuseum.ComicActivity;
+import com.quarkstar.comicmuseum.R;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
