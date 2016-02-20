@@ -13,16 +13,20 @@ import com.quarkstar.comicmuseum.ComicActivity;
 import com.quarkstar.comicmuseum.R;
 import com.squareup.picasso.Picasso;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class AllGamesAdapter extends RecyclerView.Adapter<AllGamesAdapter.CustomViewHolder> {
 
     private List<ComicData> feedItemList;
     private Context mContext;
+    Map<Integer, List<String>> comicDetail = new HashMap<>();
 
-    public AllGamesAdapter(Context context, List<ComicData> feedItemList) {
+    public AllGamesAdapter(Context context, List<ComicData> feedItemList, Map<Integer, List<String>> comicDetail) {
         this.feedItemList = feedItemList;
         this.mContext = context;
+        this.comicDetail = comicDetail;
     }
 
     @Override
@@ -40,15 +44,11 @@ public class AllGamesAdapter extends RecyclerView.Adapter<AllGamesAdapter.Custom
         Log.e("imageURL", feedItem.getImageUrl());
         //Download image using picasso library
 
-        String thumbImageUrl;
-        if (i < 10)
-            thumbImageUrl = "https://dl.dropboxusercontent.com/u/21785336/Big_Shot_Comics_005/t/00" + i + ".jpg";
-        else
-            thumbImageUrl = "https://dl.dropboxusercontent.com/u/21785336/Big_Shot_Comics_005/t/0" + i + ".jpg";
+        String thumbImageUrl = "https://dl.dropboxusercontent.com/u/21785336/"+comicDetail.get(i).get(0)+"/t/001.jpg";
 
         Picasso.with(mContext).load(thumbImageUrl).into(customViewHolder.icon);
 
-        customViewHolder.game.setText("Comic " + i);
+        customViewHolder.game.setText(comicDetail.get(i).get(1));
     }
 
     @Override
@@ -71,7 +71,7 @@ public class AllGamesAdapter extends RecyclerView.Adapter<AllGamesAdapter.Custom
         @Override
         public void onClick(View v) {
             Intent intent = new Intent(mContext, ComicActivity.class);
-//            ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(Ma, Pair.create((View)icon, "cover"),Pair.create((View)icon, "icon"));
+            intent.putExtra("clickedIndex", this.getLayoutPosition());
             mContext.startActivity(intent);
         }
 

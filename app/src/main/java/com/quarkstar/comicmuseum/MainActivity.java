@@ -11,8 +11,7 @@ import android.view.View;
 import com.quarkstar.comicmuseum.adapter.AllGamesAdapter;
 import com.quarkstar.comicmuseum.adapter.ComicData;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -61,15 +60,22 @@ public class MainActivity extends AppCompatActivity {
             comicList = new ArrayList();
         }
 
-        for (int i = 1; i < 30; i++) {
-            thumbImageUrl = "https://dl.dropboxusercontent.com/u/21785336/Big Shot Comics/t/0" + ((i < 10) ? "0" : "") + i + ".jpg";
+        Map<Integer, List<String>> comicDetail = new HashMap<>();
+        comicDetail.put(0, Arrays.asList("Adventures_into_the_Unknown_001", "Adventures into the Unknown"));
+        comicDetail.put(1, Arrays.asList("Big_Shot_Comics_005", "Big Shot Comics"));
+        comicDetail.put(2, Arrays.asList("Space_Detective_001", "Space Detective"));
+        comicDetail.put(3, Arrays.asList("Wings_013", "Wings"));
+
+        for (int i = 0; i < 4; i++) {
+            //https://dl.dropboxusercontent.com/u/21785336/Adventures_into_the_Unknown_001/t/001.jpg
+            thumbImageUrl = "https://dl.dropboxusercontent.com/u/21785336/"+ comicDetail.get(i).get(0) +"/t/001.jpg";
 
             ComicData game = new ComicData();
             game.setgameName("Big Shot Comics " + i);
             game.setImageUrl(thumbImageUrl);
             comicList.add(game);
         }
-        AllGamesAdapter mAdapter = new AllGamesAdapter(MainActivity.this, comicList);
+        AllGamesAdapter mAdapter = new AllGamesAdapter(MainActivity.this, comicList, comicDetail);
         mRecyclerView.setAdapter(mAdapter);
     }
 
