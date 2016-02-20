@@ -61,10 +61,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         Map<Integer, List<String>> comicDetail = new HashMap<>();
-        comicDetail.put(0, Arrays.asList("Adventures_into_the_Unknown_001", "Adventures into the Unknown"));
-        comicDetail.put(1, Arrays.asList("Big_Shot_Comics_005", "Big Shot Comics"));
-        comicDetail.put(2, Arrays.asList("Space_Detective_001", "Space Detective"));
-        comicDetail.put(3, Arrays.asList("Wings_013", "Wings"));
+        comicDetail.put(0, Arrays.asList("Adventures_into_the_Unknown_001", "Adventures into the Unknown", "51"));
+        comicDetail.put(1, Arrays.asList("Big_Shot_Comics_005", "Big Shot Comics", "67"));
+        comicDetail.put(2, Arrays.asList("Space_Detective_001", "Space Detective", "36"));
+        comicDetail.put(3, Arrays.asList("Wings_013", "Wings", "67"));
 
         for (int i = 0; i < 4; i++) {
             //https://dl.dropboxusercontent.com/u/21785336/Adventures_into_the_Unknown_001/t/001.jpg
