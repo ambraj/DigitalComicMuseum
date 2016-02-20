@@ -1,4 +1,4 @@
-package com.quarkstar.comicmuseum;
+package com.quarkstar.goldencomics;
 
 import android.graphics.Rect;
 import android.os.Bundle;
@@ -8,8 +8,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import com.quarkstar.comicmuseum.adapter.AllGamesAdapter;
-import com.quarkstar.comicmuseum.adapter.ComicData;
+import com.quarkstar.goldencomics.adapter.AllGamesAdapter;
+import com.quarkstar.goldencomics.adapter.ComicData;
 
 import java.util.*;
 
