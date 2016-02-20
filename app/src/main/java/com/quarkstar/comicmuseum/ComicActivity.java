@@ -16,6 +16,7 @@
 package com.quarkstar.comicmuseum;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.view.PagerAdapter;
@@ -28,11 +29,19 @@ import android.widget.ImageView;
 import com.squareup.picasso.Picasso;
 import uk.co.senab.photoview.PhotoView;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class ComicActivity extends Activity {
 
     private static final String ISLOCKED_ARG = "isLocked";
     int picPosition;
     private ViewPager mViewPager;
+    Intent intent;
+    String comicIndex;
+    Map<Integer, List<String>> comicDetail = new HashMap<>();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -40,6 +49,14 @@ public class ComicActivity extends Activity {
         setContentView(R.layout.activity_comic);
         mViewPager = (HackyViewPager) findViewById(R.id.view_pager);
         setContentView(mViewPager);
+
+        intent = getIntent();
+        comicIndex = intent.getExtras().get("clickedIndex").toString();
+
+        comicDetail.put(0, Arrays.asList("Adventures_into_the_Unknown_001", "Adventures into the Unknown", "51"));
+        comicDetail.put(1, Arrays.asList("Big_Shot_Comics_005", "Big Shot Comics", "67"));
+        comicDetail.put(2, Arrays.asList("Space_Detective_001", "Space Detective", "36"));
+        comicDetail.put(3, Arrays.asList("Wings_013", "Wings", "67"));
 
         mViewPager.setAdapter(new SamplePagerAdapter());
 
@@ -76,15 +93,15 @@ public class ComicActivity extends Activity {
 
         @Override
         public int getCount() {
-            return 27;
+            return Integer.valueOf(comicDetail.get(Integer.valueOf(comicIndex)).get(2));
         }
 
         @Override
         public View instantiateItem(ViewGroup container, int position) {
             picPosition = position;
-            String comic_name = getResources().getString(R.string.comic_3);
+            String comic_name = comicDetail.get(Integer.valueOf(comicIndex)).get(0);
             String comic_link = getResources().getString(R.string.url_comic);
-            String file_name = String.format("%03d", (position)) + ".jpg";
+            String file_name = String.format("%03d", (position+1)) + ".jpg";
 
             ImageView mImageView = new PhotoView(container.getContext());
             Picasso.with(container.getContext()).load(getImageUrl(comic_name, comic_link, file_name)).into(mImageView);
