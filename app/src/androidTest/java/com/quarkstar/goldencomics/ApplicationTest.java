@@ -1,4 +1,4 @@
-package com.quarkstar.comicmuseum;
+package com.quarkstar.goldencomics;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
