@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2011, 2012 Chris Banes.
- * <p/>
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p/>
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p/>
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,10 +38,10 @@ public class ComicActivity extends Activity {
 
     private static final String ISLOCKED_ARG = "isLocked";
     int picPosition;
-    private ViewPager mViewPager;
     Intent intent;
     String comicIndex;
     Map<Integer, List<String>> comicDetail = new HashMap<>();
+    private ViewPager mViewPager;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -84,7 +84,7 @@ public class ComicActivity extends Activity {
     }
 
     private String getImageUrl(String comic_name, String comic_link, String file_name) {
-        String imageUrl = getResources().getString(R.string.base_url) + "/" + comic_name + "/" + comic_link + "/" + file_name;
+        String imageUrl = getResources().getString(R.string.base_url) + comic_name + "/" + comic_link + "/" + file_name;
         Log.e("getImageUrl: ", imageUrl);
         return imageUrl;
     }
@@ -101,7 +101,7 @@ public class ComicActivity extends Activity {
             picPosition = position;
             String comic_name = comicDetail.get(Integer.valueOf(comicIndex)).get(0);
             String comic_link = getResources().getString(R.string.url_comic);
-            String file_name = String.format("%03d", (position+1)) + ".jpg";
+            String file_name = String.format("%03d", (position + 1)) + ".jpg";
 
             ImageView mImageView = new PhotoView(container.getContext());
             Picasso.with(container.getContext()).load(getImageUrl(comic_name, comic_link, file_name)).into(mImageView);

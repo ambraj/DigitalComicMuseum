@@ -10,26 +10,23 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 import com.quarkstar.goldencomics.ComicActivity;
 import com.quarkstar.goldencomics.R;
-import com.squareup.picasso.Callback;
+import com.quarkstar.goldencomics.model.DatabaseHelper;
 import com.squareup.picasso.Picasso;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class AllGamesAdapter extends RecyclerView.Adapter<AllGamesAdapter.CustomViewHolder> {
 
     private List<ComicData> feedItemList;
     private Context mContext;
-    Map<Integer, List<String>> comicDetail = new HashMap<>();
+    private DatabaseHelper dbHelper;
 
-    public AllGamesAdapter(Context context, List<ComicData> feedItemList, Map<Integer, List<String>> comicDetail) {
+    public AllGamesAdapter(Context context, List<ComicData> feedItemList, DatabaseHelper dbHelper) {
         this.feedItemList = feedItemList;
         this.mContext = context;
-        this.comicDetail = comicDetail;
+        this.dbHelper = dbHelper;
     }
 
     @Override
@@ -47,11 +44,13 @@ public class AllGamesAdapter extends RecyclerView.Adapter<AllGamesAdapter.Custom
         Log.e("imageURL", feedItem.getImageUrl());
         //Download image using picasso library
 
-        String thumbImageUrl = "https://dl.dropboxusercontent.com/u/21785336/"+comicDetail.get(i).get(0)+"/t/001.jpg";
+//        String thumbImageUrl = "https://dl.dropboxusercontent.com/u/21785336/" + feedItem.getSeriesName() + "/t/1.jpg";
 
-        Picasso.with(mContext).load(thumbImageUrl).into(customViewHolder.icon);
+        Log.e("thumbImageUrl = ", feedItem.getSeriesName());
 
-        customViewHolder.game.setText(comicDetail.get(i).get(1));
+        Picasso.with(mContext).load(feedItem.getImageUrl()).into(customViewHolder.icon);
+
+        customViewHolder.game.setText(feedItem.getSeriesName());
     }
 
     @Override
@@ -74,39 +73,39 @@ public class AllGamesAdapter extends RecyclerView.Adapter<AllGamesAdapter.Custom
 
             view.setOnClickListener(this);
 
-            downloadIconLayout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Toast toast = Toast.makeText(mContext, "downloading...", Toast.LENGTH_LONG);
-                    toast.show();
-
-                    int comicIndex = CustomViewHolder.this.getLayoutPosition();
-                    final int pageCountInComic = Integer.valueOf(comicDetail.get(Integer.valueOf(CustomViewHolder.this.getLayoutPosition())).get(2));
-                    for (int i = 0; i < pageCountInComic; i++) {
-                        String comic_name = comicDetail.get(Integer.valueOf(comicIndex)).get(0);
-                        String comic_link = mContext.getResources().getString(R.string.url_comic);
-                        String file_name = String.format("%03d", (i+1)) + ".jpg";
-
-                        final int pageCount = i;
-
-                        final String comicUrl = getImageUrl(comic_name, comic_link, file_name);
-                        Picasso.with(mContext).load(comicUrl).fetch(new Callback() {
-                            @Override
-                            public void onSuccess() {
-                                Log.e("Downloaded",comicUrl);
-                                if(pageCount == pageCountInComic-1){
-                                    downloadIcon.setImageResource(R.drawable.ic_cloud_done_white);
-                                }
-                            }
-
-                            @Override
-                            public void onError() {
-                                Log.e("ERROR",comicUrl);
-                            }
-                        });
-                    }
-                }
-            });
+//            downloadIconLayout.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    Toast toast = Toast.makeText(mContext, "downloading...", Toast.LENGTH_LONG);
+//                    toast.show();
+//
+//                    int comicIndex = CustomViewHolder.this.getLayoutPosition();
+//                    final int pageCountInComic = Integer.valueOf(comicDetail.get(Integer.valueOf(CustomViewHolder.this.getLayoutPosition())).get(2));
+//                    for (int i = 0; i < pageCountInComic; i++) {
+//                        String comic_name = comicDetail.get(Integer.valueOf(comicIndex)).get(0);
+//                        String comic_link = mContext.getResources().getString(R.string.url_comic);
+//                        String file_name = String.format("%03d", (i + 1)) + ".jpg";
+//
+//                        final int pageCount = i;
+//
+//                        final String comicUrl = getImageUrl(comic_name, comic_link, file_name);
+//                        Picasso.with(mContext).load(comicUrl).fetch(new Callback() {
+//                            @Override
+//                            public void onSuccess() {
+//                                Log.e("Downloaded", comicUrl);
+//                                if (pageCount == pageCountInComic - 1) {
+//                                    downloadIcon.setImageResource(R.drawable.ic_cloud_done_white);
+//                                }
+//                            }
+//
+//                            @Override
+//                            public void onError() {
+//                                Log.e("ERROR", comicUrl);
+//                            }
+//                        });
+//                    }
+//                }
+//            });
         }
 
         private String getImageUrl(String comic_name, String comic_link, String file_name) {

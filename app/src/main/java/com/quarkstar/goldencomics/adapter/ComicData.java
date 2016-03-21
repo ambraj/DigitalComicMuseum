@@ -2,7 +2,7 @@ package com.quarkstar.goldencomics.adapter;
 
 public class ComicData {
     private String imageUrl;
-    private String gameName;
+    private String seriesName;
 
     public String getImageUrl() {
         return imageUrl;
@@ -12,12 +12,12 @@ public class ComicData {
         this.imageUrl = imageUrl;
     }
 
-    public String getGameName() {
-        return gameName;
+    public String getSeriesName() {
+        return seriesName;
     }
 
-    public void setgameName(String name) {
-        this.gameName = name;
+    public void setSeriesName(String name) {
+        this.seriesName = name;
     }
 
 }
