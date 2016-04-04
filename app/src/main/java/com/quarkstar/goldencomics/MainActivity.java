@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,7 +14,8 @@ import com.quarkstar.goldencomics.adapter.AllGamesAdapter;
 import com.quarkstar.goldencomics.adapter.ComicData;
 import com.quarkstar.goldencomics.model.DatabaseHelper;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -78,46 +80,31 @@ public class MainActivity extends AppCompatActivity {
 
         Cursor cursorComic = dbHelper.fetchComicData(DatabaseHelper.TABLE_COMIC, DatabaseHelper.CONDITION_TRUE);
 
-        while (cursorComic.moveToNext()){
+        while (cursorComic.moveToNext()) {
             String seriesUrl = "";
             String comicId = cursorComic.getString(cursorComic.getColumnIndex(DatabaseHelper.COLUMN_ID));
             String comicName = cursorComic.getString(cursorComic.getColumnIndex(DatabaseHelper.COLUMN_NAME));
+            Log.e("comic name = ", comicName);
             String comicPageCount = cursorComic.getString(cursorComic.getColumnIndex(DatabaseHelper.COLUMN_PAGE_COUNT));
             String seriesId = cursorComic.getString(cursorComic.getColumnIndex(DatabaseHelper.COLUMN_SERIES_ID));
 
-            Cursor cursorSeries = dbHelper.fetchComicData(DatabaseHelper.TABLE_SERIES, "_id="+seriesId);
-            while (cursorSeries.moveToNext()){
+            Cursor cursorSeries = dbHelper.fetchComicData(DatabaseHelper.TABLE_SERIES, "_id=" + seriesId);
+            while (cursorSeries.moveToNext()) {
                 seriesUrl = cursorSeries.getString(cursorSeries.getColumnIndex(DatabaseHelper.COLUMN_SERIES_URL));
             }
 
-            String comicUrl = getResources().getString(R.string.base_url) + seriesUrl+"/"+comicName+"/t/";
+            String comicUrl = getResources().getString(R.string.base_url) + seriesUrl + "/" + comicName + "/t/";
+            String thumbImageUrl = comicUrl + "1.jpg";
 
-//            for (int i = 1; i < cursorComic.getCount(); i++) {
-                String thumbImageUrl = comicUrl + "1.jpg";
+            ComicData comic = new ComicData();
+            comic.setComicName(comicName);
+            comic.setSeriesName(seriesUrl);
+            comic.setImageUrl(thumbImageUrl);
+            comic.setPageCount(Integer.parseInt(comicPageCount));
 
-                ComicData comic = new ComicData();
-                comic.setSeriesName(seriesUrl);
-                comic.setImageUrl(thumbImageUrl);
-                comicList.add(comic);
-//            }
+            comicList.add(comic);
         }
 
-//        Map<Integer, List<String>> comicDetail = new HashMap<>();
-//        comicDetail.put(0, Arrays.asList("Adventures_into_the_Unknown", "Adventures into the Unknown", "51"));
-//        comicDetail.put(1, Arrays.asList("Big_Shot_Comics", "Big Shot Comics", "67"));
-//        comicDetail.put(2, Arrays.asList("Space_Detective", "Space Detective", "36"));
-//        comicDetail.put(3, Arrays.asList("Wings", "Wings", "67"));
-//        comicDetail.put(4, Arrays.asList("Santa_Claus_Funnies", "Santa Claus Funnies", "67"));
-//
-//        for (int i = 0; i < 4; i++) {
-//            //https://dl.dropboxusercontent.com/u/21785336/Adventures_into_the_Unknown_001/t/001.jpg
-//            thumbImageUrl = getResources().getString(R.string.base_url) + comicDetail.get(i).get(0) + "/t/001.jpg";
-//
-//            ComicData game = new ComicData();
-//            game.setSeriesName("Big Shot Comics " + i);
-//            game.setImageUrl(thumbImageUrl);
-//            comicList.add(game);
-//        }
         AllGamesAdapter mAdapter = new AllGamesAdapter(MainActivity.this, comicList, dbHelper);
         mRecyclerView.setAdapter(mAdapter);
     }

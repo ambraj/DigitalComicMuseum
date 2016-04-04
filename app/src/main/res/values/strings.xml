@@ -19,5 +19,9 @@
     <string name="url_thumb">t</string>
 
     <string name="base_url">https://dl.dropboxusercontent.com/u/21785336/</string>
+    <string name="title_activity_main">MainActivity</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
 
 </resources>

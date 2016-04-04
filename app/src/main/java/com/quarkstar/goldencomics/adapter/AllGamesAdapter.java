@@ -15,6 +15,7 @@ import com.quarkstar.goldencomics.R;
 import com.quarkstar.goldencomics.model.DatabaseHelper;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class AllGamesAdapter extends RecyclerView.Adapter<AllGamesAdapter.CustomViewHolder> {
@@ -32,6 +33,7 @@ public class AllGamesAdapter extends RecyclerView.Adapter<AllGamesAdapter.Custom
     @Override
     public CustomViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.comic_grid_item, null);
+        view.setTag(feedItemList);
 
         CustomViewHolder viewHolder = new CustomViewHolder(view);
         return viewHolder;
@@ -50,7 +52,7 @@ public class AllGamesAdapter extends RecyclerView.Adapter<AllGamesAdapter.Custom
 
         Picasso.with(mContext).load(feedItem.getImageUrl()).into(customViewHolder.icon);
 
-        customViewHolder.game.setText(feedItem.getSeriesName());
+        customViewHolder.seriesName.setText(feedItem.getSeriesName());
     }
 
     @Override
@@ -60,14 +62,14 @@ public class AllGamesAdapter extends RecyclerView.Adapter<AllGamesAdapter.Custom
 
     public class CustomViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         final ImageView icon;
-        final TextView game;
+        final TextView seriesName;
         final RelativeLayout downloadIconLayout;
         ImageView downloadIcon;
 
         public CustomViewHolder(final View view) {
             super(view);
             this.icon = (ImageView) view.findViewById(R.id.comic_thumbnail);
-            this.game = (TextView) view.findViewById(R.id.comic_title);
+            this.seriesName = (TextView) view.findViewById(R.id.comic_title);
             this.downloadIconLayout = (RelativeLayout) view.findViewById(R.id.download_icon_div);
             this.downloadIcon = (ImageView) view.findViewById(R.id.download_icon);
 
@@ -108,16 +110,27 @@ public class AllGamesAdapter extends RecyclerView.Adapter<AllGamesAdapter.Custom
 //            });
         }
 
-        private String getImageUrl(String comic_name, String comic_link, String file_name) {
-            String imageUrl = mContext.getResources().getString(R.string.base_url) + "/" + comic_name + "/" + comic_link + "/" + file_name;
-            Log.e("getImageUrl: ", imageUrl);
-            return imageUrl;
-        }
+//        private String getImageUrl(String comic_name, String comic_link, String file_name) {
+//            String imageUrl = mContext.getResources().getString(R.string.base_url) + "/" + comic_name + "/" + comic_link + "/" + file_name;
+//            Log.e("getImageUrl: ", imageUrl);
+//            return imageUrl;
+//        }
 
         @Override
         public void onClick(View v) {
+            int position = getLayoutPosition();
+            String comicUrl = seriesName.getText().toString();
+            List<ComicData> comicList = (ArrayList<ComicData>) v.getTag();
+            String comicName = comicList.get(position).getComicName();
+            int pageCount = comicList.get(position).getPageCount();
+
+            Log.e("AllGamesAdapter", "comic name = "+comicName);
+
             Intent intent = new Intent(mContext, ComicActivity.class);
             intent.putExtra("clickedIndex", this.getLayoutPosition());
+            intent.putExtra("comicUrl", comicUrl);
+            intent.putExtra("comicName", comicName);
+            intent.putExtra("comicPageCount", pageCount);
             mContext.startActivity(intent);
         }
 

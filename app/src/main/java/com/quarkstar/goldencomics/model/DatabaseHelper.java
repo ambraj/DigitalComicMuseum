@@ -75,7 +75,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             String myPath = DB_PATH + DATABASE_NAME;
             checkDB = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READONLY);
         } catch (SQLiteException e) {
-            Log.e(ERROR_TAG, "checkDataBase: can't open database"+ DB_PATH + DATABASE_NAME);
+            Log.e(ERROR_TAG, "checkDataBase: can't open database" + DB_PATH + DATABASE_NAME);
         }
 
         if (checkDB != null) {
@@ -114,9 +114,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         myInput.close();
     }
 
-    public Cursor fetchComicData(String tableName, String condition){
+    public Cursor fetchComicData(String tableName, String condition) {
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery("select * from " +tableName+ " where "+condition, null);
+        Cursor cursor = db.rawQuery("select * from " + tableName + " where " + condition, null);
 
         return cursor;
     }
