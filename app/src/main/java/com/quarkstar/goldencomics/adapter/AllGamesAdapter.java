@@ -10,9 +10,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import com.quarkstar.goldencomics.ComicActivity;
+import com.quarkstar.goldencomics.ViewComicActivity;
 import com.quarkstar.goldencomics.R;
-import com.quarkstar.goldencomics.model.DatabaseHelper;
+import com.quarkstar.goldencomics.database.DatabaseHelper;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -32,7 +32,7 @@ public class AllGamesAdapter extends RecyclerView.Adapter<AllGamesAdapter.Custom
 
     @Override
     public CustomViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.comic_grid_item, null);
+        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.comic_card_layout, null);
         view.setTag(feedItemList);
 
         CustomViewHolder viewHolder = new CustomViewHolder(view);
@@ -44,9 +44,6 @@ public class AllGamesAdapter extends RecyclerView.Adapter<AllGamesAdapter.Custom
         ComicData feedItem = feedItemList.get(i);
 
         Log.e("imageURL", feedItem.getImageUrl());
-        //Download image using picasso library
-
-//        String thumbImageUrl = "https://dl.dropboxusercontent.com/u/21785336/" + feedItem.getSeriesName() + "/t/1.jpg";
 
         Log.e("thumbImageUrl = ", feedItem.getSeriesName());
 
@@ -124,9 +121,9 @@ public class AllGamesAdapter extends RecyclerView.Adapter<AllGamesAdapter.Custom
             String comicName = comicList.get(position).getComicName();
             int pageCount = comicList.get(position).getPageCount();
 
-            Log.e("AllGamesAdapter", "comic name = "+comicName);
+            Log.e("AllGamesAdapter", "comic name = " + comicName);
 
-            Intent intent = new Intent(mContext, ComicActivity.class);
+            Intent intent = new Intent(mContext, ViewComicActivity.class);
             intent.putExtra("clickedIndex", this.getLayoutPosition());
             intent.putExtra("comicUrl", comicUrl);
             intent.putExtra("comicName", comicName);

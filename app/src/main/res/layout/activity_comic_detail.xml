@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/comic_detail_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="com.quarkstar.goldencomics.ComicDetailActivity">
+
+
+    <ImageView
+            android:id="@+id/imageView_comic_preview_background"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/thumb_not_available"
+            android:scaleType="centerCrop"/>
+
+    <ImageView
+            android:layout_width="190dp"
+            android:layout_height="280dp"
+            android:id="@+id/imageView_comic_preview_thumb"
+            android:paddingTop="10dp"
+            android:layout_gravity="center_horizontal|top"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="25dp"/>
+
+    <Button
+            android:layout_width="155dp"
+            android:layout_height="40dp"
+            android:text="START READING"
+            android:id="@+id/button_start_reading"
+            android:layout_gravity="center"
+            android:background="#3573ba"
+            android:textColor="#f8f1f1"
+            android:layout_below="@+id/imageView_comic_preview_thumb"
+            android:layout_alignLeft="@+id/imageView_comic_preview_thumb"
+            android:layout_alignStart="@+id/imageView_comic_preview_thumb"
+            android:layout_marginTop="35dp"
+            android:layout_alignRight="@+id/imageView_comic_preview_thumb"
+            android:layout_alignEnd="@+id/imageView_comic_preview_thumb"/>
+
+    <Button
+            android:layout_width="90dp"
+            android:layout_height="40dp"
+            android:text="ADD TO LIBRARY"
+            android:id="@+id/button_addToLibrary"
+            android:background="#dce5f8"
+            android:textColor="#2e2e2e"
+            android:layout_below="@+id/button_start_reading"
+            android:layout_toLeftOf="@+id/button3"
+            android:layout_marginTop="22dp"
+            android:layout_alignLeft="@+id/button_start_reading"
+            android:layout_alignStart="@+id/button_start_reading"/>
+
+    <Button
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:text=":"
+            android:textStyle="bold"
+            android:id="@+id/button3"
+            android:background="#3573ba"
+            android:textColor="#f8f1f1"
+            android:layout_alignTop="@+id/button_addToLibrary"
+            android:layout_alignRight="@+id/button_start_reading"
+            android:layout_alignEnd="@+id/button_start_reading"/>
+
+
+</RelativeLayout>

@@ -10,12 +10,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="#450f05">
+            android:background="#312522">
 
         <ImageView
                 android:id="@+id/comic_thumbnail"
                 android:layout_width="fill_parent"
-                android:layout_height="250dp"
+                android:layout_height="185dp"
                 android:layout_gravity="center"
                 android:scaleType="centerCrop"
                 android:transitionName="comic_thumbnail"
@@ -30,15 +30,16 @@
                 android:layout_alignParentTop="true"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true"
+                android:visibility="invisible"
                 android:paddingTop="2dp"
                 android:paddingRight="2dp"/>
 
         <RelativeLayout
                 android:id="@+id/download_icon_div"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
+                android:layout_height="32dp"
                 android:layout_alignParentBottom="true"
-                android:background="#bd5d5656">
+                android:background="#96312522">
 
             <ImageView
                     android:layout_width="30dp"
@@ -50,9 +51,9 @@
                     android:layout_alignParentRight="true"
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentTop="true"
+                    android:visibility="invisible"
                     android:paddingRight="4dp"
-                    android:paddingLeft="2dp"
-            />
+                    android:paddingLeft="2dp" />
 
             <TextView
                     android:layout_width="wrap_content"
@@ -62,7 +63,7 @@
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentBottom="true"
-                    android:textSize="16dp"
+                    android:textSize="11dp"
                     android:layout_alignParentTop="true"
                     android:textColor="#ffffff"
                     android:gravity="center_vertical"

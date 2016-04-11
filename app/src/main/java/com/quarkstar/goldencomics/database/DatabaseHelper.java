@@ -1,4 +1,4 @@
-package com.quarkstar.goldencomics.model;
+package com.quarkstar.goldencomics.database;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -7,10 +7,7 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String TABLE_COMIC = "comic";
@@ -117,6 +114,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public Cursor fetchComicData(String tableName, String condition) {
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery("select * from " + tableName + " where " + condition, null);
+
+        return cursor;
+    }
+
+    public Cursor fetchComicDataUsingQuery(String query) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
 
         return cursor;
     }

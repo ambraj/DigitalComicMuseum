@@ -1,6 +1,0 @@
-<com.quarkstar.goldencomics.HackyViewPager xmlns:android="http://schemas.android.com/apk/res/android"
-                                           android:id="@+id/view_pager"
-                                           android:layout_width="match_parent"
-                                           android:layout_height="match_parent"
-                                           android:background="#000000">
-</com.quarkstar.goldencomics.HackyViewPager>

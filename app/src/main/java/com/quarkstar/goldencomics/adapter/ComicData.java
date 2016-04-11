@@ -1,10 +1,29 @@
 package com.quarkstar.goldencomics.adapter;
 
 public class ComicData {
+
+    private int comicId;
     private String imageUrl;
     private String seriesName;
     private String comicName;
     private int pageCount;
+    private String seriesId;
+
+    public String getSeriesId() {
+        return seriesId;
+    }
+
+    public void setSeriesId(String seriesId) {
+        this.seriesId = seriesId;
+    }
+
+    public int getComicId() {
+        return comicId;
+    }
+
+    public void setComicId(int comicId) {
+        this.comicId = comicId;
+    }
 
     public String getImageUrl() {
         return imageUrl;

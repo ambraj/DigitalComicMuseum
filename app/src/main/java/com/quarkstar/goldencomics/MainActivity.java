@@ -1,43 +1,52 @@
 package com.quarkstar.goldencomics;
 
-import android.database.Cursor;
-import android.graphics.Rect;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import com.quarkstar.goldencomics.adapter.AllGamesAdapter;
-import com.quarkstar.goldencomics.adapter.ComicData;
-import com.quarkstar.goldencomics.model.DatabaseHelper;
+import android.view.Window;
+import com.quarkstar.goldencomics.fragment.ComicGridFragment;
+import com.quarkstar.goldencomics.fragment.SeriesWiseRackFragment;
+import com.quarkstar.goldencomics.database.DatabaseHelper;
 
-import java.util.ArrayList;
-import java.util.List;
+public class MainActivity extends AppCompatActivity
+    implements NavigationView.OnNavigationItemSelectedListener, ComicGridFragment.OnFragmentInteractionListener, SeriesWiseRackFragment.OnFragmentInteractionListener {
 
-public class MainActivity extends AppCompatActivity {
-
-    String thumbImageUrl;
-    private RecyclerView mRecyclerView;
-    private List<ComicData> comicList = new ArrayList<>();
     private DatabaseHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().requestFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
         setContentView(R.layout.activity_main);
-
-        mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        int spacingInPixels = getResources().getDimensionPixelSize(R.dimen.spacing_card);
-        mRecyclerView.addItemDecoration(new SpacesItemDecoration(spacingInPixels));
-        mRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
-        mRecyclerView.setHasFixedSize(true);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         setupDatabase();
 
-        setUpGameList();
+        //Set the fragment initially
+//        ComicGridFragment fragment = ComicGridFragment.newInstance(dbHelper);
+        SeriesWiseRackFragment fragment = SeriesWiseRackFragment.newInstance(dbHelper);
+
+        android.support.v4.app.FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_container, fragment);
+        fragmentTransaction.commit();
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+            this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
     }
 
     private void setupDatabase() {
@@ -49,10 +58,25 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public DatabaseHelper getDatabaseHelper(){
+        return dbHelper;
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.navigation_drawer, menu);
         return true;
     }
 
@@ -71,57 +95,50 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void setUpGameList() {
-        if (comicList == null) {
-            comicList = new ArrayList();
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.nav_all_comics) {
+            getSupportActionBar().setTitle("All Comics");
+
+            SeriesWiseRackFragment fragment = new SeriesWiseRackFragment();
+            android.support.v4.app.FragmentTransaction fragmentTransaction =
+                getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.fragment_container, fragment);
+            fragmentTransaction.commit();
+        } else if (id == R.id.nav_favorites) {
+            getSupportActionBar().setTitle("My Library");
+
+            ComicGridFragment fragment = new ComicGridFragment();
+            android.support.v4.app.FragmentTransaction fragmentTransaction =
+                getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.fragment_container, fragment);
+            fragmentTransaction.commit();
+        } else if (id == R.id.nav_offline) {
+            getSupportActionBar().setTitle("Offline");
+        } else if (id == R.id.nav_currently_reading) {
+
+        } else if (id == R.id.nav_share) {
+
         }
 
-        //https://dl.dropboxusercontent.com/u/21785336/adventures_into_the_unknown/1/c/1.jpg
-
-        Cursor cursorComic = dbHelper.fetchComicData(DatabaseHelper.TABLE_COMIC, DatabaseHelper.CONDITION_TRUE);
-
-        while (cursorComic.moveToNext()) {
-            String seriesUrl = "";
-            String comicId = cursorComic.getString(cursorComic.getColumnIndex(DatabaseHelper.COLUMN_ID));
-            String comicName = cursorComic.getString(cursorComic.getColumnIndex(DatabaseHelper.COLUMN_NAME));
-            Log.e("comic name = ", comicName);
-            String comicPageCount = cursorComic.getString(cursorComic.getColumnIndex(DatabaseHelper.COLUMN_PAGE_COUNT));
-            String seriesId = cursorComic.getString(cursorComic.getColumnIndex(DatabaseHelper.COLUMN_SERIES_ID));
-
-            Cursor cursorSeries = dbHelper.fetchComicData(DatabaseHelper.TABLE_SERIES, "_id=" + seriesId);
-            while (cursorSeries.moveToNext()) {
-                seriesUrl = cursorSeries.getString(cursorSeries.getColumnIndex(DatabaseHelper.COLUMN_SERIES_URL));
-            }
-
-            String comicUrl = getResources().getString(R.string.base_url) + seriesUrl + "/" + comicName + "/t/";
-            String thumbImageUrl = comicUrl + "1.jpg";
-
-            ComicData comic = new ComicData();
-            comic.setComicName(comicName);
-            comic.setSeriesName(seriesUrl);
-            comic.setImageUrl(thumbImageUrl);
-            comic.setPageCount(Integer.parseInt(comicPageCount));
-
-            comicList.add(comic);
-        }
-
-        AllGamesAdapter mAdapter = new AllGamesAdapter(MainActivity.this, comicList, dbHelper);
-        mRecyclerView.setAdapter(mAdapter);
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
     }
 
-    public class SpacesItemDecoration extends RecyclerView.ItemDecoration {
-        private final int space;
+    @Override
+    public void onMainFragmentInteraction(Uri uri) {
 
-        public SpacesItemDecoration(int space) {
-            this.space = space;
-        }
-
-        @Override
-        public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
-            outRect.left = space;
-            outRect.right = space;
-            outRect.bottom = space;
-        }
     }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
+    }
+
 
 }

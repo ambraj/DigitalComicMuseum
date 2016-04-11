@@ -26,11 +26,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageView;
-import com.quarkstar.goldencomics.model.DatabaseHelper;
+import com.quarkstar.goldencomics.database.DatabaseHelper;
+import com.quarkstar.goldencomics.ui.HackyViewPager;
 import com.squareup.picasso.Picasso;
 import uk.co.senab.photoview.PhotoView;
 
-public class ComicActivity extends Activity {
+public class ViewComicActivity extends Activity {
 
     private static final String ISLOCKED_ARG = "isLocked";
     int picPosition;
@@ -46,14 +47,14 @@ public class ComicActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_comic);
+        setContentView(R.layout.activity_view_comic);
         mViewPager = (HackyViewPager) findViewById(R.id.view_pager);
         setContentView(mViewPager);
 
         dbHelper = new DatabaseHelper(this);
 
         intent = getIntent();
-        comicIndex = intent.getExtras().get("clickedIndex").toString();
+//        comicIndex = intent.getExtras().get("clickedIndex").toString();
         comicUrl = intent.getExtras().getString("comicUrl").toString();
         comicName = intent.getExtras().getString("comicName").toString();
         pageCount = intent.getExtras().getInt("comicPageCount");
@@ -100,7 +101,7 @@ public class ComicActivity extends Activity {
         public View instantiateItem(ViewGroup container, int position) {
             picPosition = position;
             String comic_link = getResources().getString(R.string.url_comic);
-            String file_name = (position+1) + ".jpg";
+            String file_name = (position + 1) + ".jpg";
 
             ImageView mImageView = new PhotoView(container.getContext());
             Picasso.with(container.getContext()).load(getImageUrl(comic_link, file_name)).into(mImageView);
