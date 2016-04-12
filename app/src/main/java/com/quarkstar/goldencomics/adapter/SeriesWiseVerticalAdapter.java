@@ -71,7 +71,7 @@ public class SeriesWiseVerticalAdapter extends RecyclerView.Adapter<SeriesWiseVe
             }
 
             String comicUrl = context.getResources().getString(R.string.base_url) + seriesUrl + "/" + comicName + "/t/";
-            String thumbImageUrl = comicUrl + "1.jpg";
+            String thumbImageUrl = comicUrl + "1.webp";
 
             ComicData comic = new ComicData();
             comic.setComicId(comicId);

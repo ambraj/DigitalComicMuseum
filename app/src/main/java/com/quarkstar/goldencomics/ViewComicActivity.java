@@ -101,7 +101,7 @@ public class ViewComicActivity extends Activity {
         public View instantiateItem(ViewGroup container, int position) {
             picPosition = position;
             String comic_link = getResources().getString(R.string.url_comic);
-            String file_name = (position + 1) + ".jpg";
+            String file_name = (position + 1) + ".webp";
 
             ImageView mImageView = new PhotoView(container.getContext());
             Picasso.with(container.getContext()).load(getImageUrl(comic_link, file_name)).into(mImageView);
