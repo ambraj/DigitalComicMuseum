@@ -10,9 +10,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import com.quarkstar.goldencomics.ViewComicActivity;
+import com.quarkstar.goldencomics.ComicDetailActivity;
 import com.quarkstar.goldencomics.R;
 import com.quarkstar.goldencomics.database.DatabaseHelper;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -40,16 +42,42 @@ public class AllGamesAdapter extends RecyclerView.Adapter<AllGamesAdapter.Custom
     }
 
     @Override
-    public void onBindViewHolder(CustomViewHolder customViewHolder, int i) {
-        ComicData feedItem = feedItemList.get(i);
+    public void onBindViewHolder(final CustomViewHolder customViewHolder, int i) {
+        final ComicData feedItem = feedItemList.get(i);
 
         Log.e("imageURL", feedItem.getImageUrl());
 
         Log.e("thumbImageUrl = ", feedItem.getSeriesName());
 
-        Picasso.with(mContext).load(feedItem.getImageUrl()).into(customViewHolder.icon);
+        Picasso.with(mContext).load(feedItem.getImageUrl()).networkPolicy(NetworkPolicy.OFFLINE).into(customViewHolder.icon);
+
+        Picasso.with(mContext).load(feedItem.getImageUrl()).networkPolicy(NetworkPolicy.OFFLINE)
+            .into(customViewHolder.icon, new Callback() {
+                @Override
+                public void onSuccess() {
+                }
+
+                @Override
+                public void onError() {
+                    //Try again online if cache failed
+                    Picasso.with(mContext)
+                        .load(feedItem.getImageUrl())
+                        .error(R.drawable.profile)
+                        .into(customViewHolder.icon, new Callback() {
+                            @Override
+                            public void onSuccess() {
+                            }
+
+                            @Override
+                            public void onError() {
+                                Log.v("Picasso","Could not fetch image");
+                            }
+                        });
+                }
+            });
 
         customViewHolder.seriesName.setText(feedItem.getSeriesName());
+        customViewHolder.seriesNameView.setText(feedItem.getSeriesName().replace("_", " "));
     }
 
     @Override
@@ -60,13 +88,15 @@ public class AllGamesAdapter extends RecyclerView.Adapter<AllGamesAdapter.Custom
     public class CustomViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         final ImageView icon;
         final TextView seriesName;
+        final TextView seriesNameView;
         final RelativeLayout downloadIconLayout;
         ImageView downloadIcon;
 
         public CustomViewHolder(final View view) {
             super(view);
             this.icon = (ImageView) view.findViewById(R.id.comic_thumbnail);
-            this.seriesName = (TextView) view.findViewById(R.id.comic_title);
+            this.seriesName = (TextView) view.findViewById(R.id.comic_title_temp);
+            this.seriesNameView = (TextView) view.findViewById(R.id.comic_title);
             this.downloadIconLayout = (RelativeLayout) view.findViewById(R.id.download_icon_div);
             this.downloadIcon = (ImageView) view.findViewById(R.id.download_icon);
 
@@ -118,15 +148,19 @@ public class AllGamesAdapter extends RecyclerView.Adapter<AllGamesAdapter.Custom
             int position = getLayoutPosition();
             String comicUrl = seriesName.getText().toString();
             List<ComicData> comicList = (ArrayList<ComicData>) v.getTag();
+            int comicId = comicList.get(position).getComicId();
             String comicName = comicList.get(position).getComicName();
+            String thumbUrl = comicList.get(position).getImageUrl();
             int pageCount = comicList.get(position).getPageCount();
 
             Log.e("AllGamesAdapter", "comic name = " + comicName);
 
-            Intent intent = new Intent(mContext, ViewComicActivity.class);
+            Intent intent = new Intent(mContext, ComicDetailActivity.class);
             intent.putExtra("clickedIndex", this.getLayoutPosition());
+            intent.putExtra("comicId", comicId);
             intent.putExtra("comicUrl", comicUrl);
             intent.putExtra("comicName", comicName);
+            intent.putExtra("thumbUrl", thumbUrl);
             intent.putExtra("comicPageCount", pageCount);
             mContext.startActivity(intent);
         }

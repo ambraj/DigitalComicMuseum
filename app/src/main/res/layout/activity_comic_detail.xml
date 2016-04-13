@@ -17,8 +17,8 @@
             android:scaleType="centerCrop"/>
 
     <ImageView
-            android:layout_width="190dp"
-            android:layout_height="280dp"
+            android:layout_width="250dp"
+            android:layout_height="350dp"
             android:id="@+id/imageView_comic_preview_thumb"
             android:paddingTop="10dp"
             android:layout_gravity="center_horizontal|top"
@@ -49,20 +49,9 @@
             android:background="#dce5f8"
             android:textColor="#2e2e2e"
             android:layout_below="@+id/button_start_reading"
-            android:layout_toLeftOf="@+id/button3"
             android:layout_marginTop="22dp"
             android:layout_alignLeft="@+id/button_start_reading"
-            android:layout_alignStart="@+id/button_start_reading"/>
-
-    <Button
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:text=":"
-            android:textStyle="bold"
-            android:id="@+id/button3"
-            android:background="#3573ba"
-            android:textColor="#f8f1f1"
-            android:layout_alignTop="@+id/button_addToLibrary"
+            android:layout_alignStart="@+id/button_start_reading"
             android:layout_alignRight="@+id/button_start_reading"
             android:layout_alignEnd="@+id/button_start_reading"/>
 

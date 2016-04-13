@@ -68,6 +68,14 @@
                     android:textColor="#ffffff"
                     android:gravity="center_vertical"
                     android:paddingLeft="8dp"/>
+
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/comic_name"
+                    android:id="@+id/comic_title_temp"
+                    android:gravity="center_vertical"
+                    android:visibility="gone"/>
         </RelativeLayout>
 
     </RelativeLayout>

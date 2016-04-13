@@ -65,6 +65,7 @@ public class ComicGridFragment extends Fragment {
         setUpGameList();
     }
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -79,11 +80,11 @@ public class ComicGridFragment extends Fragment {
 
         //https://dl.dropboxusercontent.com/u/21785336/adventures_into_the_unknown/1/c/1.jpg
 
-        Cursor cursorComic = dbHelper.fetchComicData(DatabaseHelper.TABLE_COMIC, DatabaseHelper.CONDITION_TRUE);
+        Cursor cursorComic = dbHelper.fetchComicData(DatabaseHelper.TABLE_COMIC, "favorite='y'");
 
         while (cursorComic.moveToNext()) {
             String seriesUrl = "";
-            String comicId = cursorComic.getString(cursorComic.getColumnIndex(DatabaseHelper.COLUMN_ID));
+            int comicId = cursorComic.getInt(cursorComic.getColumnIndex(DatabaseHelper.COLUMN_ID));
             String comicName = cursorComic.getString(cursorComic.getColumnIndex(DatabaseHelper.COLUMN_NAME));
             Log.e("comic name = ", comicName);
             String comicPageCount = cursorComic.getString(cursorComic.getColumnIndex(DatabaseHelper.COLUMN_PAGE_COUNT));
@@ -98,6 +99,7 @@ public class ComicGridFragment extends Fragment {
             String thumbImageUrl = comicUrl + "1.webp";
 
             ComicData comic = new ComicData();
+            comic.setComicId(comicId);
             comic.setComicName(comicName);
             comic.setSeriesName(seriesUrl);
             comic.setImageUrl(thumbImageUrl);

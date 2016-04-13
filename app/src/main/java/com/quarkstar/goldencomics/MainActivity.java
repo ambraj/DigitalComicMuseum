@@ -117,13 +117,13 @@ public class MainActivity extends AppCompatActivity
                 getSupportFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.fragment_container, fragment);
             fragmentTransaction.commit();
-        } else if (id == R.id.nav_offline) {
+        } /*else if (id == R.id.nav_offline) {
             getSupportActionBar().setTitle("Offline");
-        } else if (id == R.id.nav_currently_reading) {
+        } */else if (id == R.id.nav_currently_reading) {
 
-        } else if (id == R.id.nav_share) {
+        } /*else if (id == R.id.nav_share) {
 
-        }
+        }*/
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

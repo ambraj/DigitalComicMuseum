@@ -1,5 +1,6 @@
 package com.quarkstar.goldencomics.database;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -7,7 +8,10 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import java.io.*;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String TABLE_COMIC = "comic";
@@ -123,6 +127,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery(query, null);
 
         return cursor;
+    }
+
+    public int addComicToLibrary(String comicId, String status){
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put("favorite", status);
+
+        return db.update(TABLE_COMIC, values, COLUMN_ID + "=" + comicId, null);
+    }
+
+    public int updateLastReadPageNo(String comicId, int pageNo){
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put("last_read_page", pageNo);
+
+        return db.update(TABLE_COMIC, values, COLUMN_ID + "=" + comicId, null);
     }
 
     @Override

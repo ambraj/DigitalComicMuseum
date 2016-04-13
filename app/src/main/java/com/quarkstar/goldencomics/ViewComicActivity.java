@@ -28,6 +28,8 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageView;
 import com.quarkstar.goldencomics.database.DatabaseHelper;
 import com.quarkstar.goldencomics.ui.HackyViewPager;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 import uk.co.senab.photoview.PhotoView;
 
@@ -36,7 +38,7 @@ public class ViewComicActivity extends Activity {
     private static final String ISLOCKED_ARG = "isLocked";
     int picPosition;
     Intent intent;
-    String comicIndex;
+    String comicId;
     String comicUrl;
     String comicName;
     int pageCount;
@@ -54,12 +56,13 @@ public class ViewComicActivity extends Activity {
         dbHelper = new DatabaseHelper(this);
 
         intent = getIntent();
-//        comicIndex = intent.getExtras().get("clickedIndex").toString();
+        comicId = intent.getExtras().get("comicId").toString();
         comicUrl = intent.getExtras().getString("comicUrl").toString();
         comicName = intent.getExtras().getString("comicName").toString();
         pageCount = intent.getExtras().getInt("comicPageCount");
 
-        mViewPager.setAdapter(new SamplePagerAdapter());
+        SamplePagerAdapter pagerAdapter = new SamplePagerAdapter();
+        mViewPager.setAdapter(pagerAdapter);
 
         if (savedInstanceState != null) {
             boolean isLocked = savedInstanceState.getBoolean(ISLOCKED_ARG, false);
@@ -98,13 +101,40 @@ public class ViewComicActivity extends Activity {
         }
 
         @Override
-        public View instantiateItem(ViewGroup container, int position) {
+        public View instantiateItem(final ViewGroup container, int position) {
             picPosition = position;
-            String comic_link = getResources().getString(R.string.url_comic);
-            String file_name = (position + 1) + ".webp";
+            final String comic_link = getResources().getString(R.string.url_comic);
+            final String file_name = (position + 1) + ".webp";
 
-            ImageView mImageView = new PhotoView(container.getContext());
-            Picasso.with(container.getContext()).load(getImageUrl(comic_link, file_name)).into(mImageView);
+//            dbHelper.updateLastReadPageNo(comicId, (position+1));
+
+            final ImageView mImageView = new PhotoView(container.getContext());
+//            Picasso.with(container.getContext()).load(getImageUrl(comic_link, file_name)).networkPolicy(NetworkPolicy.OFFLINE).into(mImageView);
+
+            Picasso.with(container.getContext()).load(getImageUrl(comic_link, file_name)).networkPolicy(NetworkPolicy.OFFLINE)
+                .into(mImageView, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                    }
+
+                    @Override
+                    public void onError() {
+                        //Try again online if cache failed
+                        Picasso.with(container.getContext())
+                            .load(getImageUrl(comic_link, file_name))
+                            .error(R.drawable.profile)
+                            .into(mImageView, new Callback() {
+                                @Override
+                                public void onSuccess() {
+                                }
+
+                                @Override
+                                public void onError() {
+                                    Log.v("Picasso","Could not fetch image");
+                                }
+                            });
+                    }
+                });
 
             container.addView(mImageView, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 

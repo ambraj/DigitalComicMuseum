@@ -3,6 +3,7 @@ package com.quarkstar.goldencomics;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -11,10 +12,14 @@ import android.renderscript.Element;
 import android.renderscript.RenderScript;
 import android.renderscript.ScriptIntrinsicBlur;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import com.quarkstar.goldencomics.database.DatabaseHelper;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 public class ComicDetailActivity extends AppCompatActivity {
@@ -22,6 +27,7 @@ public class ComicDetailActivity extends AppCompatActivity {
     ImageView comicThumbnail;
     ImageView comicThumbnailBackground;
     Intent intent;
+    String comicId;
     String comicIndex;
     String comicUrl;
     String thumbUrl;
@@ -29,11 +35,16 @@ public class ComicDetailActivity extends AppCompatActivity {
     int pageCount;
     Button startReadingButton;
     Button addToLibraryButton;
+    DatabaseHelper dbHelper;
+    String addToLibraryStatus;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comic_detail);
+
+        dbHelper = new DatabaseHelper(this);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -43,6 +54,7 @@ public class ComicDetailActivity extends AppCompatActivity {
         registerClickHandlers();
 
         intent = getIntent();
+        comicId = intent.getExtras().get("comicId").toString();
         comicIndex = intent.getExtras().get("clickedIndex").toString();
         comicUrl = intent.getExtras().getString("comicUrl").toString();
         thumbUrl = intent.getExtras().getString("thumbUrl").toString();
@@ -56,7 +68,32 @@ public class ComicDetailActivity extends AppCompatActivity {
         Bitmap blurred = blurRenderScript(ComicDetailActivity.this, icon, 25);
                 comicThumbnailBackground.setImageBitmap(blurred);
 
-        Picasso.with(this).load(thumbUrl).into(comicThumbnail);
+//        Picasso.with(this).load(thumbUrl).networkPolicy(NetworkPolicy.OFFLINE).into(comicThumbnail);
+        Picasso.with(this).load(thumbUrl).networkPolicy(NetworkPolicy.OFFLINE)
+            .into(comicThumbnail, new Callback() {
+                @Override
+                public void onSuccess() {
+                }
+
+                @Override
+                public void onError() {
+                    //Try again online if cache failed
+                    Picasso.with(ComicDetailActivity.this)
+                        .load(thumbUrl)
+                        .error(R.drawable.profile)
+                        .into(comicThumbnail, new Callback() {
+                            @Override
+                            public void onSuccess() {
+                            }
+
+                            @Override
+                            public void onError() {
+                                Log.v("Picasso","Could not fetch image");
+                            }
+                        });
+                }
+            });
+
 //        Picasso.with(this).load(thumbUrl).into(comicThumbnailBackground, new Callback() {
 //            @Override
 //            public void onSuccess() {
@@ -69,6 +106,16 @@ public class ComicDetailActivity extends AppCompatActivity {
 //
 //            }
 //        });
+
+        Cursor cursorComic = dbHelper.fetchComicData(DatabaseHelper.TABLE_COMIC, DatabaseHelper.COLUMN_ID+"="+comicId);
+
+        while (cursorComic.moveToNext()) {
+            addToLibraryStatus = cursorComic.getString(cursorComic.getColumnIndex("favorite"));
+//            TextView seriesTextView = (TextView) holder.recyclerView.getRootView().findViewById(R.id.series_textView);
+            if(addToLibraryStatus.equals("y")) {
+                addToLibraryButton.setText("Remove from library");
+            }
+        }
     }
 
     private void registerClickHandlers(){
@@ -76,11 +123,27 @@ public class ComicDetailActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(ComicDetailActivity.this, ViewComicActivity.class);
-//                intent.putExtra("clickedIndex", this.getLayoutPosition());
+                intent.putExtra("comicId", comicId);
                 intent.putExtra("comicUrl", comicUrl);
                 intent.putExtra("comicName", comicName);
                 intent.putExtra("comicPageCount", pageCount);
                 ComicDetailActivity.this.startActivity(intent);
+            }
+        });
+
+        addToLibraryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(addToLibraryStatus.equals("n")) {
+//                    Toast.makeText(ComicDetailActivity.this, "Added to library!", Toast.LENGTH_LONG).show();
+                    addToLibraryButton.setText("Remove from library");
+                } else {
+//                    Toast.makeText(ComicDetailActivity.this, "Removed from library!", Toast.LENGTH_LONG).show();
+                    addToLibraryButton.setText("Add to library");
+                }
+                dbHelper.addComicToLibrary(comicId, addToLibraryStatus.equals("y") ? "n":"y");
+
+                addToLibraryStatus = addToLibraryStatus.equals("y") ? "n":"y";
             }
         });
     }
