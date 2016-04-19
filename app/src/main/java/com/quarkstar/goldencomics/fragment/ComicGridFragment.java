@@ -13,6 +13,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+import com.quarkstar.goldencomics.AnalyticsApplication;
 import com.quarkstar.goldencomics.MainActivity;
 import com.quarkstar.goldencomics.R;
 import com.quarkstar.goldencomics.adapter.AllGamesAdapter;
@@ -30,8 +33,11 @@ public class ComicGridFragment extends Fragment {
     private RecyclerView mRecyclerView;
     private List<ComicData> comicList = new ArrayList<>();
     private DatabaseHelper dbHelper;
-
     private OnFragmentInteractionListener mListener;
+    /**
+     * used to record screen views.
+     */
+    private Tracker mTracker;
 
     public ComicGridFragment() {
         // Required empty public constructor
@@ -48,6 +54,30 @@ public class ComicGridFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Obtain the shared Tracker instance.
+        AnalyticsApplication application = (AnalyticsApplication) getActivity().getApplication();
+        mTracker = application.getDefaultTracker();
+
+        // Send initial screen screen view hit.
+        sendScreenImageName();
+
+    }
+
+    /**
+     * Record a screen view hit for the visible one
+     */
+    private void sendScreenImageName() {
+        String name = "comic grid view";
+
+        // [START screen_view_hit]
+        Log.i("Activity", "Setting screen name: " + name);
+        mTracker.setScreenName("Image~" + name);
+        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
     }
 
     @Override
@@ -70,7 +100,7 @@ public class ComicGridFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_comic_grid, container, false);
+        return inflater.inflate(R.layout.fragment_comic_grid, null);
     }
 
     private void setUpGameList() {

@@ -17,6 +17,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.quarkstar.goldencomics.database.DatabaseHelper;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
@@ -37,7 +39,10 @@ public class ComicDetailActivity extends AppCompatActivity {
     Button addToLibraryButton;
     DatabaseHelper dbHelper;
     String addToLibraryStatus;
-
+    /**
+     * used to record screen views.
+     */
+    private Tracker mTracker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,6 +121,30 @@ public class ComicDetailActivity extends AppCompatActivity {
                 addToLibraryButton.setText("Remove from library");
             }
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Obtain the shared Tracker instance.
+        AnalyticsApplication application = (AnalyticsApplication) getApplication();
+        mTracker = application.getDefaultTracker();
+
+        // Send initial screen screen view hit.
+        sendScreenImageName();
+
+    }
+
+    /**
+     * Record a screen view hit for the visible one
+     */
+    private void sendScreenImageName() {
+        String name = "Comic detail page";
+
+        // [START screen_view_hit]
+        Log.i("Activity", "Setting screen name: " + name);
+        mTracker.setScreenName("Image~" + name);
+        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
     }
 
     private void registerClickHandlers(){

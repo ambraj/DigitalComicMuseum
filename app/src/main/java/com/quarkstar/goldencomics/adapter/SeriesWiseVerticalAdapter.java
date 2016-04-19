@@ -2,6 +2,7 @@ package com.quarkstar.goldencomics.adapter;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.databinding.DataBindingUtil;
 import android.os.Parcelable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -10,8 +11,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.TextView;
+import com.quarkstar.goldencomics.MainActivity;
 import com.quarkstar.goldencomics.R;
 import com.quarkstar.goldencomics.database.DatabaseHelper;
+import com.quarkstar.goldencomics.databinding.SeriesWiseVerticalItemBinding;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,6 +44,9 @@ public class SeriesWiseVerticalAdapter extends RecyclerView.Adapter<SeriesWiseVe
 
     @Override
     public SeriesWiseVerticalAdapter.ViewHolder onCreateViewHolder(final ViewGroup parent, int viewType) {
+        SeriesWiseVerticalItemBinding binding = DataBindingUtil.setContentView((MainActivity)context, R.layout.series_wise_vertical_item);
+        binding.setUser("****************&&&&&&&&&&&&&&&************(***");
+
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.series_wise_vertical_item, parent, false);
         ViewHolder vh = new ViewHolder(v);
         return vh;
@@ -50,10 +56,6 @@ public class SeriesWiseVerticalAdapter extends RecyclerView.Adapter<SeriesWiseVe
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
         linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-//        ArrayList<String> dataset1 = new ArrayList<>();
-//        for (int i = 0; i < 100; i++) {
-//            dataset1.add(String.valueOf(i));
-//        }
 
         List<ComicData> comicList = new ArrayList<>();
         Cursor cursorComic = dbHelper.fetchComicData(DatabaseHelper.TABLE_COMIC, DatabaseHelper.COLUMN_SERIES_ID+"="+dataset.get(position));
@@ -83,8 +85,20 @@ public class SeriesWiseVerticalAdapter extends RecyclerView.Adapter<SeriesWiseVe
             comicList.add(comic);
         }
         if(comicList.size() < 3){
-            TextView moreTextView = (TextView) holder.recyclerView.getRootView().findViewById(R.id.more_textView);
+            final TextView moreTextView = (TextView) holder.recyclerView.getRootView().findViewById(R.id.more_textView);
             moreTextView.setVisibility(View.GONE);
+
+
+
+//            moreTextView.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    ComicGridFragment fragment = new ComicGridFragment();
+//                    FragmentTransaction fragmentTransaction = ((FragmentActivity)((FragmentActivity)context).getParent()).getSupportFragmentManager().beginTransaction();
+//                    fragmentTransaction.replace(R.id.fragment_container, fragment);
+//                    fragmentTransaction.commit();
+//                }
+//            });
         }
 
         cursorComic = dbHelper.fetchComicData(DatabaseHelper.TABLE_SERIES, DatabaseHelper.COLUMN_ID+"="+dataset.get(position));
@@ -134,7 +148,6 @@ public class SeriesWiseVerticalAdapter extends RecyclerView.Adapter<SeriesWiseVe
                 }
             });
         }
-
 
         public void setPosition(int position) {
             this.position = position;

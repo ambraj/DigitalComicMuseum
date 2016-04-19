@@ -1,5 +1,6 @@
 package com.quarkstar.goldencomics;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -8,17 +9,25 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.Window;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+import com.quarkstar.goldencomics.database.DatabaseHelper;
 import com.quarkstar.goldencomics.fragment.ComicGridFragment;
 import com.quarkstar.goldencomics.fragment.SeriesWiseRackFragment;
-import com.quarkstar.goldencomics.database.DatabaseHelper;
 
 public class MainActivity extends AppCompatActivity
     implements NavigationView.OnNavigationItemSelectedListener, ComicGridFragment.OnFragmentInteractionListener, SeriesWiseRackFragment.OnFragmentInteractionListener {
 
     private DatabaseHelper dbHelper;
+    /**
+     * used to record screen views.
+     */
+    private Tracker mTracker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +36,10 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        // Obtain the shared Tracker instance.
+        AnalyticsApplication application = (AnalyticsApplication) getApplication();
+        mTracker = application.getDefaultTracker();
 
         setupDatabase();
 
@@ -49,6 +62,28 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+
+        // Send initial screen screen view hit.
+        sendScreenImageName();
+
+    }
+
+    /**
+     * Record a screen view hit for the visible one
+     */
+    private void sendScreenImageName() {
+        String name = "Series Wise comic rack";
+
+        // [START screen_view_hit]
+        Log.i("Activity", "Setting screen name: " + name);
+        mTracker.setScreenName("Image~" + name);
+        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
+    }
+
     private void setupDatabase() {
         try {
             dbHelper = new DatabaseHelper(this);
@@ -58,7 +93,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public DatabaseHelper getDatabaseHelper(){
+    public DatabaseHelper getDatabaseHelper() {
         return dbHelper;
     }
 
@@ -119,15 +154,34 @@ public class MainActivity extends AppCompatActivity
             fragmentTransaction.commit();
         } /*else if (id == R.id.nav_offline) {
             getSupportActionBar().setTitle("Offline");
-        } */else if (id == R.id.nav_currently_reading) {
+        } else if (id == R.id.nav_currently_reading) {
 
-        } /*else if (id == R.id.nav_share) {
-
-        }*/
+        } */ else if (id == R.id.nav_share) {
+            try {
+                Intent i = new Intent(Intent.ACTION_SEND);
+                i.setType("text/plain");
+                i.putExtra(Intent.EXTRA_SUBJECT, "Golden Comics");
+                String sAux = "\nLet me recommend you this application\n\n";
+                sAux = sAux + "https://play.google.com/store/apps/details?id=com.quarkstar.goldencomics\n";
+                i.putExtra(Intent.EXTRA_TEXT, sAux);
+                startActivity(Intent.createChooser(i, "choose one"));
+            } catch (Exception e) {
+                e.toString();
+            }
+        }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    public void setClickHandlerOnMoreTextView(View v){
+//        v.getParent();
+        ComicGridFragment fragment = new ComicGridFragment();
+        android.support.v4.app.FragmentTransaction fragmentTransaction =
+            getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_container, fragment);
+        fragmentTransaction.commit();
     }
 
     @Override

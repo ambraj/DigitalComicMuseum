@@ -10,13 +10,12 @@
                 android:id="@+id/nav_favorites"
                 android:icon="@drawable/ic_menu_camera"
                 android:title="My Library"/>
-        <item
+        <!--<item
                 android:id="@+id/nav_currently_reading"
                 android:icon="@drawable/ic_menu_manage"
-                android:title="Currently Reading"/>
+                android:title="Currently Reading"/>-->
     </group>
 
-    <!--
     <item android:title="Communicate">
         <menu>
             <item
@@ -25,5 +24,4 @@
                     android:title="Share"/>
         </menu>
     </item>
-    -->
 </menu>

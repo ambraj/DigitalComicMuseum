@@ -8,9 +8,13 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+import com.quarkstar.goldencomics.AnalyticsApplication;
 import com.quarkstar.goldencomics.MainActivity;
 import com.quarkstar.goldencomics.R;
 import com.quarkstar.goldencomics.adapter.SeriesWiseVerticalAdapter;
@@ -30,6 +34,8 @@ public class SeriesWiseRackFragment extends Fragment {
     private RecyclerView mRecyclerView;
     private DatabaseHelper dbHelper;
     private List<String> seriesIdList;
+    private Tracker mTracker;
+
 
     public SeriesWiseRackFragment() {
         // Required empty public constructor
@@ -46,6 +52,30 @@ public class SeriesWiseRackFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Obtain the shared Tracker instance.
+        AnalyticsApplication application = (AnalyticsApplication) getActivity().getApplication();
+        mTracker = application.getDefaultTracker();
+
+        // Send initial screen screen view hit.
+        sendScreenImageName();
+
+    }
+
+    /**
+     * Record a screen view hit for the visible one
+     */
+    private void sendScreenImageName() {
+        String name = "Series Wise comic rack";
+
+        // [START screen_view_hit]
+        Log.i("Activity", "Setting screen name: " + name);
+        mTracker.setScreenName("Image~" + name);
+        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
     }
 
     @Override
@@ -112,6 +142,5 @@ public class SeriesWiseRackFragment extends Fragment {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
-
 
 }

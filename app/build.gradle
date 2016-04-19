@@ -1,15 +1,20 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion 23
     buildToolsVersion '23.0.2'
 
+    dataBinding {
+        enabled = true
+    }
+
     defaultConfig {
         applicationId "com.quarkstar.goldencomics"
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 4
-        versionName "1.2"
+        versionCode 5
+        versionName "1.3"
     }
     signingConfigs {
         release {
@@ -38,4 +43,5 @@ dependencies {
     compile 'com.android.support:design:23.2.1'
     compile 'com.android.support:support-v4:23.2.1'
     compile 'de.hdodenhof:circleimageview:1.3.0'
+    compile 'com.google.android.gms:play-services-analytics:8.3.0'
 }
