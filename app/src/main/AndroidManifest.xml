@@ -15,8 +15,8 @@
         <activity
                 android:name=".MainActivity"
                 android:label="@string/app_name"
-                android:theme="@style/AppTheme.NoActionBar"
-                android:screenOrientation="portrait">
+                android:screenOrientation="portrait"
+                android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -28,8 +28,10 @@
         <activity
                 android:name=".ComicDetailActivity"
                 android:label="@string/title_activity_comic_detail"
-                android:theme="@style/TransparentTheme"
-                android:screenOrientation="portrait">
+                android:screenOrientation="portrait"
+                android:theme="@style/TransparentTheme">
+        </activity>
+        <activity android:name=".AllComicsFromSeriesActivity">
         </activity>
     </application>
 

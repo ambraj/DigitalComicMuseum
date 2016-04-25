@@ -30,7 +30,6 @@ import com.quarkstar.goldencomics.database.DatabaseHelper;
 import com.quarkstar.goldencomics.ui.HackyViewPager;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
-import com.squareup.picasso.Picasso;
 import uk.co.senab.photoview.PhotoView;
 
 public class ViewComicActivity extends Activity {
@@ -111,7 +110,10 @@ public class ViewComicActivity extends Activity {
             final ImageView mImageView = new PhotoView(container.getContext());
 //            Picasso.with(container.getContext()).load(getImageUrl(comic_link, file_name)).networkPolicy(NetworkPolicy.OFFLINE).into(mImageView);
 
-            Picasso.with(container.getContext()).load(getImageUrl(comic_link, file_name)).networkPolicy(NetworkPolicy.OFFLINE)
+            PicassoCache.getPicassoInstance(container.getContext())
+                .load(getImageUrl(comic_link, file_name))
+                .placeholder( R.drawable.progress_animation )
+                .networkPolicy(NetworkPolicy.OFFLINE)
                 .into(mImageView, new Callback() {
                     @Override
                     public void onSuccess() {
@@ -120,9 +122,9 @@ public class ViewComicActivity extends Activity {
                     @Override
                     public void onError() {
                         //Try again online if cache failed
-                        Picasso.with(container.getContext())
+                        PicassoCache.getPicassoInstance(container.getContext())
                             .load(getImageUrl(comic_link, file_name))
-                            .error(R.drawable.profile)
+                            .placeholder( R.drawable.progress_animation )
                             .into(mImageView, new Callback() {
                                 @Override
                                 public void onSuccess() {

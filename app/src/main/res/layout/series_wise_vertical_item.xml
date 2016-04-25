@@ -1,56 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="180dp"
+              android:background="#313131"
+              android:layout_marginBottom="10dp"
+              android:orientation="vertical">
 
-    <data>
-        <variable name="user" type="String"/>
-    </data>
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:text="New Text"
+            android:id="@+id/series_textView"
+            android:textColor="#d7d5d5"
+            android:textStyle="bold"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="63dp"
+            android:gravity="center_vertical"/>
 
-    <RelativeLayout
+    <android.support.v7.widget.RecyclerView
+            android:id="@+id/horizontal_grid_view"
             android:layout_width="match_parent"
-            android:layout_height="180dp"
-            android:background="#313131"
-            android:layout_marginBottom="10dp"
-            android:orientation="vertical">
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/series_textView"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"/>
 
-        <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="50dp"
-                android:text="New Text"
-                android:id="@+id/series_textView"
-                android:textColor="#d7d5d5"
-                android:textStyle="bold"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_marginLeft="10dp"
-                android:layout_marginStart="63dp"
-                android:gravity="center_vertical"/>
-
-        <android.support.v7.widget.RecyclerView
-                android:id="@+id/horizontal_grid_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/series_textView"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"/>
-
-        <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="MORE"
-                android:id="@+id/more_textView"
-                android:gravity="center_vertical"
-                android:textSize="11dp"
-                android:textColor="#cacccb"
-                android:onClick="setClickHandlerOnMoreTextView"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true"
-                android:layout_marginRight="22dp"
-                android:layout_marginEnd="22dp"
-                android:layout_above="@+id/horizontal_grid_view"
-                />
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="MORE"
+            android:id="@+id/more_textView"
+            android:gravity="center_vertical"
+            android:textSize="11dp"
+            android:textColor="#cacccb"
+            android:onClick="setClickHandlerOnMoreTextView"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginRight="22dp"
+            android:layout_marginEnd="22dp"
+            android:layout_above="@+id/horizontal_grid_view"
+            />
 
 
-    </RelativeLayout>
-</layout>
+</RelativeLayout>

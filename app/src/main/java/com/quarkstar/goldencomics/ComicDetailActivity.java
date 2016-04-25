@@ -22,7 +22,6 @@ import com.google.android.gms.analytics.Tracker;
 import com.quarkstar.goldencomics.database.DatabaseHelper;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
-import com.squareup.picasso.Picasso;
 
 public class ComicDetailActivity extends AppCompatActivity {
 
@@ -52,6 +51,7 @@ public class ComicDetailActivity extends AppCompatActivity {
         dbHelper = new DatabaseHelper(this);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setTitle("");
 
         startReadingButton = (Button) findViewById(R.id.button_start_reading);
         addToLibraryButton = (Button) findViewById(R.id.button_addToLibrary);
@@ -74,7 +74,7 @@ public class ComicDetailActivity extends AppCompatActivity {
                 comicThumbnailBackground.setImageBitmap(blurred);
 
 //        Picasso.with(this).load(thumbUrl).networkPolicy(NetworkPolicy.OFFLINE).into(comicThumbnail);
-        Picasso.with(this).load(thumbUrl).networkPolicy(NetworkPolicy.OFFLINE)
+        PicassoCache.getPicassoInstance(this).load(thumbUrl).networkPolicy(NetworkPolicy.OFFLINE)
             .into(comicThumbnail, new Callback() {
                 @Override
                 public void onSuccess() {
@@ -83,9 +83,8 @@ public class ComicDetailActivity extends AppCompatActivity {
                 @Override
                 public void onError() {
                     //Try again online if cache failed
-                    Picasso.with(ComicDetailActivity.this)
+                    PicassoCache.getPicassoInstance(ComicDetailActivity.this)
                         .load(thumbUrl)
-                        .error(R.drawable.profile)
                         .into(comicThumbnail, new Callback() {
                             @Override
                             public void onSuccess() {

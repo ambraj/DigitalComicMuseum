@@ -10,10 +10,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.quarkstar.goldencomics.ComicDetailActivity;
+import com.quarkstar.goldencomics.PicassoCache;
 import com.quarkstar.goldencomics.R;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,21 +45,22 @@ public class SeriesWiseHorizontalAdapter extends RecyclerView.Adapter<SeriesWise
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         holder.horizontalItemTextView.setText(dataset.get(position).getSeriesName());
-        Picasso.with(context).load(dataset.get(position).getImageUrl()).networkPolicy(NetworkPolicy.OFFLINE)
+        PicassoCache.getPicassoInstance(context).load(dataset.get(position).getImageUrl()).networkPolicy(NetworkPolicy.OFFLINE)
             .into(holder.randomImageView, new Callback() {
             @Override
             public void onSuccess() {
+                holder.horizontalItemTextView.setVisibility(View.INVISIBLE);
             }
 
             @Override
             public void onError() {
                 //Try again online if cache failed
-                Picasso.with(context)
+                PicassoCache.getPicassoInstance(context)
                     .load(dataset.get(position).getImageUrl())
-                    .error(R.drawable.profile)
                     .into(holder.randomImageView, new Callback() {
                         @Override
                         public void onSuccess() {
+                            holder.horizontalItemTextView.setVisibility(View.INVISIBLE);
                         }
 
                         @Override

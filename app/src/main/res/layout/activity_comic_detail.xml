@@ -22,9 +22,8 @@
             android:id="@+id/imageView_comic_preview_thumb"
             android:paddingTop="10dp"
             android:layout_gravity="center_horizontal|top"
-            android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="25dp"/>
+            android:layout_alignParentTop="true"/>
 
     <Button
             android:layout_width="155dp"

@@ -41,7 +41,9 @@ public class MainActivity extends AppCompatActivity
         AnalyticsApplication application = (AnalyticsApplication) getApplication();
         mTracker = application.getDefaultTracker();
 
-        setupDatabase();
+        dbHelper = new DatabaseHelper(this);
+
+//        setupDatabase();
 
         //Set the fragment initially
 //        ComicGridFragment fragment = ComicGridFragment.newInstance(dbHelper);
@@ -87,7 +89,7 @@ public class MainActivity extends AppCompatActivity
     private void setupDatabase() {
         try {
             dbHelper = new DatabaseHelper(this);
-            dbHelper.createDataBase();
+//            dbHelper.createDataBase();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -176,12 +178,11 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void setClickHandlerOnMoreTextView(View v){
-//        v.getParent();
-        ComicGridFragment fragment = new ComicGridFragment();
-        android.support.v4.app.FragmentTransaction fragmentTransaction =
-            getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_container, fragment);
-        fragmentTransaction.commit();
+        String seriesName = v.getTag().toString();
+
+        Intent intent = new Intent(this, AllComicsFromSeriesActivity.class);
+        intent.putExtra("seriesName", seriesName);
+        startActivity(intent);
     }
 
     @Override

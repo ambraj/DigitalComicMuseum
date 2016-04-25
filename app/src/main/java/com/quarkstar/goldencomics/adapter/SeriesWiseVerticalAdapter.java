@@ -2,7 +2,6 @@ package com.quarkstar.goldencomics.adapter;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.databinding.DataBindingUtil;
 import android.os.Parcelable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -11,10 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.TextView;
-import com.quarkstar.goldencomics.MainActivity;
 import com.quarkstar.goldencomics.R;
 import com.quarkstar.goldencomics.database.DatabaseHelper;
-import com.quarkstar.goldencomics.databinding.SeriesWiseVerticalItemBinding;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,9 +41,6 @@ public class SeriesWiseVerticalAdapter extends RecyclerView.Adapter<SeriesWiseVe
 
     @Override
     public SeriesWiseVerticalAdapter.ViewHolder onCreateViewHolder(final ViewGroup parent, int viewType) {
-        SeriesWiseVerticalItemBinding binding = DataBindingUtil.setContentView((MainActivity)context, R.layout.series_wise_vertical_item);
-        binding.setUser("****************&&&&&&&&&&&&&&&************(***");
-
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.series_wise_vertical_item, parent, false);
         ViewHolder vh = new ViewHolder(v);
         return vh;
@@ -84,27 +78,21 @@ public class SeriesWiseVerticalAdapter extends RecyclerView.Adapter<SeriesWiseVe
 
             comicList.add(comic);
         }
-        if(comicList.size() < 3){
-            final TextView moreTextView = (TextView) holder.recyclerView.getRootView().findViewById(R.id.more_textView);
-            moreTextView.setVisibility(View.GONE);
-
-
-
-//            moreTextView.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    ComicGridFragment fragment = new ComicGridFragment();
-//                    FragmentTransaction fragmentTransaction = ((FragmentActivity)((FragmentActivity)context).getParent()).getSupportFragmentManager().beginTransaction();
-//                    fragmentTransaction.replace(R.id.fragment_container, fragment);
-//                    fragmentTransaction.commit();
-//                }
-//            });
-        }
 
         cursorComic = dbHelper.fetchComicData(DatabaseHelper.TABLE_SERIES, DatabaseHelper.COLUMN_ID+"="+dataset.get(position));
 
         while (cursorComic.moveToNext()) {
             String seriesName = cursorComic.getString(cursorComic.getColumnIndex(DatabaseHelper.COLUMN_NAME));
+            String seriesUrl = cursorComic.getString(cursorComic.getColumnIndex(DatabaseHelper.COLUMN_SERIES_URL));
+
+            TextView moreTextView = (TextView) holder.recyclerView.getRootView().findViewById(R.id.more_textView);
+            if(comicList.size() < 5){
+                moreTextView.setVisibility(View.GONE);
+            } else {
+                moreTextView.setVisibility(View.VISIBLE);
+                moreTextView.setTag(seriesUrl);
+            }
+
             TextView seriesTextView = (TextView) holder.recyclerView.getRootView().findViewById(R.id.series_textView);
             seriesTextView.setText(seriesName.replace("_", " "));
         }

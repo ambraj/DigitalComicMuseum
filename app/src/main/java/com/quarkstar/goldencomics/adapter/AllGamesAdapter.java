@@ -11,11 +11,11 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.quarkstar.goldencomics.ComicDetailActivity;
+import com.quarkstar.goldencomics.PicassoCache;
 import com.quarkstar.goldencomics.R;
 import com.quarkstar.goldencomics.database.DatabaseHelper;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,9 +49,9 @@ public class AllGamesAdapter extends RecyclerView.Adapter<AllGamesAdapter.Custom
 
         Log.e("thumbImageUrl = ", feedItem.getSeriesName());
 
-        Picasso.with(mContext).load(feedItem.getImageUrl()).networkPolicy(NetworkPolicy.OFFLINE).into(customViewHolder.icon);
+        PicassoCache.getPicassoInstance(mContext).load(feedItem.getImageUrl()).networkPolicy(NetworkPolicy.OFFLINE).into(customViewHolder.icon);
 
-        Picasso.with(mContext).load(feedItem.getImageUrl()).networkPolicy(NetworkPolicy.OFFLINE)
+        PicassoCache.getPicassoInstance(mContext).load(feedItem.getImageUrl()).networkPolicy(NetworkPolicy.OFFLINE)
             .into(customViewHolder.icon, new Callback() {
                 @Override
                 public void onSuccess() {
@@ -60,9 +60,8 @@ public class AllGamesAdapter extends RecyclerView.Adapter<AllGamesAdapter.Custom
                 @Override
                 public void onError() {
                     //Try again online if cache failed
-                    Picasso.with(mContext)
+                    PicassoCache.getPicassoInstance(mContext)
                         .load(feedItem.getImageUrl())
-                        .error(R.drawable.profile)
                         .into(customViewHolder.icon, new Callback() {
                             @Override
                             public void onSuccess() {
@@ -78,6 +77,7 @@ public class AllGamesAdapter extends RecyclerView.Adapter<AllGamesAdapter.Custom
 
         customViewHolder.seriesName.setText(feedItem.getSeriesName());
         customViewHolder.seriesNameView.setText(feedItem.getSeriesName().replace("_", " "));
+        customViewHolder.seriesNameView.setVisibility(View.GONE);
     }
 
     @Override
